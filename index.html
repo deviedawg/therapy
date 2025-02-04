@@ -726,14 +726,11 @@ function buildSummary() {
 
   // Step 2 (up to 3 feelings)
   const feelingData = [];
-  // gather block 1 always
   const broad1 = feelingSelect1.value || "(none)";
   const sub1 = subFeelingSelect1.value || "(none)";
   if (broad1 !== "(none)") {
     feelingData.push(`Feeling #1: ${broad1}, Sub-Feeling: ${sub1}`);
   }
-
-  // block 2 if it's visible
   if (!document.getElementById("feelingBlock2").classList.contains("hidden")) {
     const broad2 = feelingSelect2.value || "(none)";
     const sub2 = subFeelingSelect2.value || "(none)";
@@ -741,8 +738,6 @@ function buildSummary() {
       feelingData.push(`Feeling #2: ${broad2}, Sub-Feeling: ${sub2}`);
     }
   }
-
-  // block 3 if it's visible
   if (!document.getElementById("feelingBlock3").classList.contains("hidden")) {
     const broad3 = feelingSelect3.value || "(none)";
     const sub3 = subFeelingSelect3.value || "(none)";
@@ -764,36 +759,30 @@ function buildSummary() {
   const newThought = document.getElementById("newThought").value.trim();
 
   return `
-STEP 1: The Situation
----------------------
-${situation}
+<b><span style="color:blue;">STEP 1: The Situation</span></b><br>
+${situation}<br><br>
 
-STEP 2: The Feeling(s)
-----------------------
-${feelingData.length > 0 ? feelingData.join("\n") : "(No feelings selected)"}
+<b><span style="color:blue;">STEP 2: The Feeling(s)</span></b><br>
+${feelingData.length > 0 ? feelingData.join("<br>") : "(No feelings selected)"}<br><br>
 
-STEP 3: The Thought
--------------------
-${thought}
+<b><span style="color:blue;">STEP 3: The Thought</span></b><br>
+${thought}<br><br>
 
-STEP 4: Evaluate the Thought
-----------------------------
-Evidence FOR: ${evidenceFor}
+<b><span style="color:blue;">STEP 4: Evaluate the Thought</span></b><br>
+<b>Evidence FOR:</b> ${evidenceFor}<br>
+<b>Evidence AGAINST:</b> ${evidenceAgainst}<br><br>
 
-Evidence AGAINST: ${evidenceAgainst}
-
-STEP 5: Make a Decision
------------------------
-Thought is: ${accuracy}
-New Thought / Action Plan: ${newThought}
+<b><span style="color:blue;">STEP 5: Make a Decision</span></b><br>
+<b>Thought is:</b> ${accuracy}<br>
+<b>New Thought / Action Plan:</b> ${newThought}
   `.trim();
 }
 
 function sendEmail() {
   const summary = buildSummary();
 
-  // Convert \n to CR+LF for iOS/Outlook:
-  const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
+  // Convert to mail-friendly HTML format
+  const safeBody = encodeURIComponent(summary.replace(/\n/g, "<br>"));
 
   // Get the user's email
   const userEmail = document.getElementById("userEmail").value.trim();
@@ -804,19 +793,18 @@ function sendEmail() {
 
   // Get the optional title input
   const customTitle = document.getElementById("emailTitle").value.trim();
-  // Use a default subject if no custom title is provided
   let finalSubject = "Your CBT Questionnaire Results";
   if (customTitle) {
-    // Combine or replace the entire subject. Example below appends:
     finalSubject += ` - ${customTitle}`;
   }
 
-  // Build the mailto link
+  // Build the mailto link (Supports HTML emails)
   const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${safeBody}`;
 
   // Open the user's mail client
   window.location.href = mailtoLink;
 }
+
 
 </script>
 </body>

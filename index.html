@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mental Health Questionnaire (Multiple Feelings, Email Results)</title>
+  <style>
+    /* ----------------------------------
+       Basic DARK THEME styling
+    -------------------------------------*/
+    html, body {
+      margin: 0; 
+      padding: 0;
+      background: #121212;
+      color: #ffffff;
+      font-family: Arial, sans-serif;
+      scroll-behavior: smooth;
+    }
+    a, button { cursor: pointer; }
+    h1, h2, h3, h4 { margin: 0; }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+    .card {
+      background: #1f1f1f;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .card h2 {
+      margin-bottom: 0.5rem;
+    }
+    label {
+      display: block;
+      margin: 0.5rem 0 0.2rem;
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 0.8rem;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background: #2a2a2a;
+      color: #ffffff;
+    }
+    button {
+      background: #4CAF50;
+      color: #ffffff;
+      border: none;
+      padding: 0.7rem 1rem;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    hr { margin: 2rem 0; border-color: #333; }
+
+    /* Big instructions toggle */
+    .instructions-toggle {
+      background: #007acc;
+      margin-bottom: 1rem;
+    }
+    .instructions-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-out;
+      border-left: 4px solid #007acc;
+      margin-bottom: 1rem;
+      padding-left: 1rem;
+    }
+    .instructions-content.open {
+      max-height: 5000px; /* big enough to show all text */
+      transition: max-height 1s ease-in;
+    }
+
+    /* 1) In your HTML <head>:
+-----------------------------------------------
+<link rel="stylesheet" 
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
+-----------------------------------------------
+
+2) Then, in your CSS file or <style> block:
+-----------------------------------------------
+*/
+
+/* Apply Nunito across the entire site */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  background: #121212;
+  color: #fff;
+}
+
+/* Ensure form elements inherit the same font */
+input, textarea, select, button {
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  color: #fff;
+  background: #2a2a2a; /* or your chosen color */
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Example heading style */
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700; /* or 400, 600, etc. */
+  color: #fff;
+}
+
+
+    /* Accordion toggles for step guidance/examples */
+    .accordion-toggle {
+      background: #333;
+      margin-bottom: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+      display: inline-block;
+    }
+    .accordion-toggle:hover { background: #444; }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-out;
+      border-left: 4px solid #444;
+      margin-bottom: 1rem;
+      padding-left: 1rem;
+    }
+    .accordion-content.open {
+      max-height: 1000px; /* enough to show text */
+      transition: max-height 1s ease-in;
+    }
+
+    /* Feeling wheel */
+    .wheel-container {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .wheel-container img {
+      max-width: 100%;
+      height: auto;
+      cursor: zoom-in;
+    }
+    .zoomed-in {
+      cursor: zoom-out;
+      max-width: 300%;
+    }
+
+    /* Hiding optional feelings initially */
+    .hidden { display: none; }
+
+    /* Preview area */
+    #previewArea {
+      background: #2a2a2a;
+      padding: 1rem;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Mental Health Questionnaire</h1>
+  <p>Fill out each step below. For Step 2, you can add up to three different feelings. When done, type in your email address and click “Send Email” to open your mail client with your answers pre‐filled.</p>
+
+  <!-- Big instructions block (collapsible) -->
+  <button class="instructions-toggle" onclick="toggleInstructions()">
+    Show/Hide Full Instructions
+  </button>
+  <div id="instructionsContent" class="instructions-content">
+    <!-- 
+      IMPORTANT: Insert your entire text verbatim here. 
+      For brevity, I'm inserting a placeholder below.
+      Replace EVERYTHING with your full instructions text so that 
+      NO text is omitted.
+    -->
+    <p>
+ <!--
+        The user wants 100% of the text included verbatim. 
+        We’ll store it in one big block. 
+        DO NOT OMIT ANY TEXT:
+      -->
+      <p>
+        The 5 Steps of Cognitive Restructuring (CR) is a skill for carefully examining your
+        thinking when you are feeling upset or distressed about something. You can use it to deal
+        with any situation in which you are experiencing negative feelings. If a close evaluation
+        of your distressing thought indicates that it is not accurate, you will change it to a more
+        accurate and less distressing thought. If your evaluation indicates that your distressing
+        thought is accurate, then you will come up with an Action Plan to deal with the situation.
+        This handout provides instructions for each of the 5 Steps of CR. Handout 28 provides a
+        worksheet for using the 5 Steps of CR to address an upsetting feeling in a specific
+        situation.
+      </p>
+      <p><strong>STEP 1: THE SITUATION</strong><br/>
+        In Step 1, you write down the upsetting situation. The situation might be an actual event,
+        such as going to the grocery store, or having an argument with someone, or a memory of
+        an event such as thinking about the disaster. In either case, just write one sentence
+        describing the situation.
+      </p>
+      <p><strong>STEP 2: THE FEELING</strong><br/>
+        In Step 2, you want to identify the most upsetting feeling you had in the situation.
+        Sometimes you may have had more than one feeling in the situation, but you should
+        focus on identifying the strongest and most upsetting feeling. It is easiest to focus on
+        four broad feelings:
+        <ul>
+          <li>fear and anxiety</li>
+          <li>sadness and depression</li>
+          <li>guilt and shame</li>
+          <li>anger</li>
+        </ul>
+        Pick one of these four feelings and work through all 5 steps with this feeling. For
+        example, fear might be the strongest feeling associated with going to the grocery store,
+        while guilt might be the strongest feeling associated with the thought of not evacuating
+        from the flood soon enough.<br/>
+        If you have more than one strong feeling about a given situation, complete a CR on the
+        first feeling and then a second CR on the next feeling.
+      </p>
+      <p><strong>STEP 3: THE THOUGHT</strong><br/>
+        In Step 3, you identify your thoughts about the situation that are underlying your
+        upsetting feelings. If you are unsure what those thoughts are, ask yourself the following
+        questions, depending on what your upsetting feelings were:
+      </p>
+      <ul>
+        <li>For fear or anxiety, ask yourself, “What bad thing do I expect to happen?” “What kind of danger am I in?”</li>
+        <li>For sadness or depression, ask yourself, “What have I lost hope in?” “What is missing in my life or in me?”</li>
+        <li>For guilt or shame, ask yourself, “What bad thing have I done?” “What is wrong with me?”</li>
+        <li>For anger, ask yourself, “What is unfair about this situation?” “Who has wronged me?”</li>
+      </ul>
+      <p>
+        These questions can help you identify the thoughts that are upsetting you. For example,
+        anxiety about going to the grocery store might be related to the thought “I won’t be able
+        to get out if someone starts shooting;” feeling guilty about not evacuating soon enough
+        might be related to the thought “If I had evacuated sooner, I would have saved my
+        father’s life.”
+      </p>
+      <p>
+        Try to be as specific as possible when identifying upsetting thoughts. For example, the
+        thought “There could be a shooter in the grocery store and I wouldn’t be able to get out
+        alive” is more specific than the thought “Something bad might happen in the grocery
+        store.” Similarly, the thought “If I had evacuated sooner, I would have been able to save
+        my father’s life” is more specific than the thought “I am a bad person.”
+      </p>
+      <p>
+        You may have several upsetting thoughts related to the situation. The following questions
+        may help you identify other upsetting thoughts about the situation:
+        <ul>
+          <li>What would it mean to you if XX happened?</li>
+          <li>If XX happened, what would happen then?</li>
+          <li>What would be so bad about XX happening?</li>
+        </ul>
+        Write down all the upsetting thoughts about the situation on the worksheet that you can
+        think of. When you are done, go through each thought and choose the one that is most
+        upsetting or distressing to you. Circle the thought on the worksheet—that is the thought
+        you will be working on for the remaining steps.
+      </p>
+      <p>
+        After identifying your most upsetting thought, consider whether it might be one of the
+        Problematic Thinking Styles listed on the worksheet. That is, ask yourself whether your
+        thought might be a common but inaccurate way of reaching conclusions in a situation.
+        For example, the thought “There could be a shooter in the grocery store and I wouldn’t be
+        able to get out alive” might be an example of the Overestimating Risk thinking style. If
+        you think your thought may be one (or more) of the Problematic Thinking Styles listed,
+        circle which ones on the worksheet. If not or you are unsure, you don’t have to circle any
+        of them.
+      </p>
+      <p><strong>STEP 4: EVALUATE THE THOUGHT</strong><br/>
+        In Step 4 you want to evaluate the accuracy of your upsetting thought as carefully and
+        objectively as possible. To do this, first think of all of the evidence you can that supports
+        your thought or makes you think it is accurate. For example, for the thought “There could
+        be a shooter in the grocery store and I wouldn’t be able to get out alive” the person could
+        ask, “Why do I think there will be a shooter in the grocery store?” and “If there was a
+        shooter there, why do I think I wouldn’t be able to get out alive?” Write all the evidence
+        down on the worksheet.
+      </p>
+      <p>
+        Then, think of all the evidence you can that does not support your thought, or suggests it
+        may not be accurate. Consider as many reasons as you can for why your thought might
+        not be correct. Then, write all the evidence against the thought down on the worksheet.
+      </p>
+      <p>
+        One way of helping you come up with evidence against the thought is to go back to Step
+        3 and examine whether you decided that the thought might be a Problematic Thinking
+        Style. If you did, and you circled one or more of the specific Problematic Thinking
+        Styles, then it means that you believe the thought may be inaccurate, and you can ask
+        yourself why you believed that. For example, if the person identifying the thought in Step
+        3 about the shooter (“There could be a shooter in the grocery store and I wouldn’t be able
+        to get out alive”) indicated that it was an example of the Overestimating Risk thinking
+        style, they could ask themselves “Does thinking that a shooter could be in the grocery
+        store overestimate the real chances of such a thing occurring?” and “Realistically, what
+        are the chances that a shooter will show up at the grocery store when I go shopping?”
+        Answers to these questions are evidence against the thought being accurate, and should
+        be recorded.
+      </p>
+      <p>
+        Another way of identifying evidence that does not support the thought is to ask yourself
+        questions that may help you look at the situation and your thought differently. Some good
+        questions to ask are:
+        <ol>
+          <li>Is there another way of looking at the situation?</li>
+          <li>Is there an alternative explanation for what happened?</li>
+          <li>How would someone else think about the situation?</li>
+          <li>Is my concern based more on how I feel than the actual facts in the situation?</li>
+          <li>Am I placing unrealistic and unobtainable standards on myself that I would never
+          expect other people to achieve?</li>
+          <li>Am I overestimating how much control and responsibility I have in this
+          situation?</li>
+          <li>What would be the worst thing that could happen if my fear were true?</li>
+          <li>Am I not considering everything I can do to deal with the problem or situation?</li>
+          <li>Am I thinking that because a low-probability event happened to me, that it is
+          very likely to happen again to me?</li>
+        </ol>
+      </p>
+      <p>
+        As an example of coming up with all the evidence for and against a thought, the person
+        evaluating the thought “There could be a shooter in the grocery store and I wouldn’t be
+        able to get out alive” might list the following evidence supporting the accuracy of the
+        thought:
+        <ul>
+          <li>Shootings can happen in public places.</li>
+          <li>I was afraid.</li>
+          <li>There was a man wearing a backpack in the store which could have had a weapon.</li>
+          <li>If a shooting happened it would be hard to get to the exit without drawing attention
+          to myself.</li>
+        </ul>
+      </p>
+      <p>
+        The person might then list the following evidence against the thought:
+        <ul>
+          <li>I have been to the grocery store many times and nothing bad has happened.</li>
+          <li>I feel afraid in a lot of situations where nothing bad happens.</li>
+          <li>Carrying a backpack doesn’t mean the man had a gun.</li>
+          <li>Mass shootings in public places like grocery stores occur very rarely, and such an
+          event is very unlikely to happen.</li>
+        </ul>
+      </p>
+      <p><strong>STEP 5: MAKE A DECISION</strong><br/>
+        Step 5 involves making a decision about whether your thought is accurate or not, based
+        on all the evidence you have listed in Step 4, and then taking action based on your
+        decision. When considering the evidence for and against the accuracy of your thought,
+        you should place the greatest weight on strong evidence that is objective and based on
+        facts, and give less attention to weak evidence that is based only on feelings or beliefs.
+        Being objective when evaluating your thought is important, since you want your
+        understanding of the situation to be as accurate as possible so that any actions you take
+        are informed and effective.
+      </p>
+      <p>
+        When trying to be objective, you can think of yourself like a scientist who is evaluating
+        the evidence supporting the effectiveness of a new treatment and is primarily interested in
+        objective facts. Or you can think of yourself like a lawyer, presenting the evidence for or
+        against a case to an impartial jury, based on the facts. You can also ask yourself whether
+        you could convince another person that the thought is true (or false).
+      </p>
+      <p>
+        For example, after weighing the evidence for and against the thought that the person
+        might encounter a shooter at the grocery store (“There could be a shooter in the grocery
+        store and I wouldn’t be able to get out alive”), the person decided that the thought was
+        not supported by the evidence and was inaccurate. The strongest pieces of evidence
+        against the thought were the fact that the person had been to the grocery store many times
+        before and nothing happened, lots of people wear backpacks that don’t carry guns, and
+        mass shootings in public places are very rare.
+      </p>
+      <p>
+        After deciding whether the thought is accurate or not (and checking the designated box
+        on the worksheet), you then take action, depending on your decision. If you concluded
+        that the evidence does not support the thought, then you come up with a new and more
+        accurate thought to replace your old inaccurate thought. This new thought is recorded on
+        the worksheet. New and more accurate thoughts are almost always associated with a
+        reduction in distress compared to the original, inaccurate thought.
+      </p>
+      <p>
+        For example, the person who concluded that their thought about encountering a shooter at
+        the grocery store was inaccurate came up with the following more accurate thought:
+        “Even though I feel anxious when I go to the grocery store, it is very unlikely that there
+        will be a shooting. It is safe for me to shop there.” This new thought was written down on
+        the worksheet
+      </p>
+      <p>
+        On the other hand, if you concluded that the evidence does support the thought, and
+        therefore that the thought is accurate, it means that you have a good reason for feeling
+        upset about the situation. In this case, taking action involves developing an Action Plan
+        for dealing with the upsetting situation, and changing it somehow. An Action Plan can be
+        developed with the help of a separate worksheet (see Handout 29), which breaks the
+        planning down into four steps: 1) define the problem, 2) brainstorm possible solutions
+        and select the best one(s), 3) make a plan to implement the selected solution(s), 4) follow
+        the plan and set a time to follow up on whether it was implemented successfully.
+      </p>
+      <p>
+        In some situations, you might first go through the 5 Steps of CR and conclude that an upsetting
+        thought was inaccurate, and then come up with a new and more accurate thought which is less
+        upsetting, but which is nevertheless still somewhat distressing. In this case, you can then develop
+        an Action Plan to deal with the distressing situation. Thus, in some situations you may need to
+        both correct inaccurate thinking to make it more accurate and create an Action Plan to address a
+        genuine problem.
+      </p>
+    </p>
+  </div>
+
+  <hr/>
+
+  <!-- Feeling Wheel -->
+  <div class="wheel-container">
+    <img 
+      id="feelingWheelImage" 
+      src="./wheel.jpeg"
+      alt="Feeling Wheel"
+      title="Tap/Click to Zoom"
+    />
+  </div>
+
+  <!-- STEP 1: SITUATION -->
+  <div class="card">
+    <h2>Step 1: The Situation</h2>
+    <button class="accordion-toggle" onclick="toggleAccordion('step1Accordion')">Show/Hide Step 1 Guidance</button>
+    <div id="step1Accordion" class="accordion-content">
+      <p><strong>Guidance:</strong> In Step 1, write down the upsetting situation. Examples:</p>
+      <ul>
+        <li>“Going to the grocery store”</li>
+        <li>“Argument with a friend”</li>
+        <li>“Memory about a past disaster”</li>
+      </ul>
+      <p>Keep it short, e.g., one sentence describing the event or memory.</p>
+    </div>
+
+    <label for="situationInput">Briefly describe the upsetting situation:</label>
+    <textarea id="situationInput" rows="3"></textarea>
+  </div>
+
+  <!-- STEP 2: THE FEELINGS (UP TO 3) -->
+  <div class="card">
+    <h2>Step 2: The Feeling(s)</h2>
+    <button class="accordion-toggle" onclick="toggleAccordion('step2Accordion')">Show/Hide Step 2 Guidance</button>
+    <div id="step2Accordion" class="accordion-content">
+      <p><strong>Guidance:</strong> Identify the most upsetting feeling(s). Typically:
+      <ul>
+        <li>Fear / Anxiety</li>
+        <li>Sadness / Depression</li>
+        <li>Guilt / Shame</li>
+        <li>Anger</li>
+      </ul>
+      You can add up to 3 different feelings if multiple feelings were strong.
+      </p>
+    </div>
+
+    <!-- FEELING BLOCK 1 -->
+    <div id="feelingBlock1">
+      <label for="feelingSelect1">Broad Feeling #1:</label>
+      <select id="feelingSelect1">
+        <option value="" disabled selected>Select one...</option>
+        <option value="fearAnxiety">Fear / Anxiety</option>
+        <option value="sadnessDepression">Sadness / Depression</option>
+        <option value="guiltShame">Guilt / Shame</option>
+        <option value="anger">Anger</option>
+      </select>
+
+      <label for="subFeelingSelect1">Sub-Feeling #1 (optional):</label>
+      <select id="subFeelingSelect1" disabled>
+        <option value="" disabled selected>Select...</option>
+      </select>
+    </div>
+
+    <!-- Button to reveal block 2 -->
+    <button id="showBlock2Btn" onclick="showFeelingBlock(2)">Add Another Feeling</button>
+
+    <!-- FEELING BLOCK 2 (hidden by default) -->
+    <div id="feelingBlock2" class="hidden">
+      <label for="feelingSelect2">Broad Feeling #2:</label>
+      <select id="feelingSelect2">
+        <option value="" disabled selected>Select one...</option>
+        <option value="fearAnxiety">Fear / Anxiety</option>
+        <option value="sadnessDepression">Sadness / Depression</option>
+        <option value="guiltShame">Guilt / Shame</option>
+        <option value="anger">Anger</option>
+      </select>
+
+      <label for="subFeelingSelect2">Sub-Feeling #2 (optional):</label>
+      <select id="subFeelingSelect2" disabled>
+        <option value="" disabled selected>Select...</option>
+      </select>
+
+      <button id="showBlock3Btn" onclick="showFeelingBlock(3)">Add Another Feeling</button>
+    </div>
+
+    <!-- FEELING BLOCK 3 (hidden by default) -->
+    <div id="feelingBlock3" class="hidden">
+      <label for="feelingSelect3">Broad Feeling #3:</label>
+      <select id="feelingSelect3">
+        <option value="" disabled selected>Select one...</option>
+        <option value="fearAnxiety">Fear / Anxiety</option>
+        <option value="sadnessDepression">Sadness / Depression</option>
+        <option value="guiltShame">Guilt / Shame</option>
+        <option value="anger">Anger</option>
+      </select>
+
+      <label for="subFeelingSelect3">Sub-Feeling #3 (optional):</label>
+      <select id="subFeelingSelect3" disabled>
+        <option value="" disabled selected>Select...</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- STEP 3: THE THOUGHT -->
+  <div class="card">
+    <h2>Step 3: The Thought</h2>
+    <button class="accordion-toggle" onclick="toggleAccordion('step3Accordion')">Show/Hide Step 3 Examples / Guidance</button>
+    <div id="step3Accordion" class="accordion-content">
+      <p><strong>Guidance Questions:</strong>
+      <ul>
+        <li><em>Fear/Anxiety:</em> “What bad thing do I expect to happen?” “What danger am I in?”</li>
+        <li><em>Sadness/Depression:</em> “What have I lost hope in?” “What is missing in my life?”</li>
+        <li><em>Guilt/Shame:</em> “What bad thing have I done?” “What is wrong with me?”</li>
+        <li><em>Anger:</em> “What is unfair about this situation?” “Who has wronged me?”</li>
+      </ul>
+      <p>You can also ask:
+        <ul>
+          <li>“What would it mean to you if XX happened?”</li>
+          <li>“If XX happened, what would happen then?”</li>
+          <li>“What would be so bad about XX happening?”</li>
+        </ul>
+      </p>
+      <p><strong>Example Thought:</strong> “If I go to the grocery store, there could be a shooter and I wouldn't be able to get out alive.”</p>
+      </p>
+    </div>
+    <label for="thoughtInput">
+      What thought(s) underlie your feeling? (Focus on the most upsetting one.)
+    </label>
+    <textarea id="thoughtInput" rows="3"></textarea>
+  </div>
+
+  <!-- STEP 4: EVALUATE THE THOUGHT -->
+  <div class="card">
+    <h2>Step 4: Evaluate the Thought</h2>
+    <button class="accordion-toggle" onclick="toggleAccordion('step4Accordion')">Show/Hide Step 4 Guidance</button>
+    <div id="step4Accordion" class="accordion-content">
+        <p><strong>Guidance:</strong> List the evidence FOR and AGAINST your thought.
+            <ul>
+              <li>Ask: “Is there another way of looking at this situation?”</li>
+              <li>“Am I overestimating the risk or how much responsibility I have?”</li>
+              <li>“What would someone else say about this situation?”</li>
+            </ul>
+            <p><strong>Example (Shooter in Grocery Store):</strong><br/>
+            <em>Evidence FOR:</em>
+            <ul>
+              <li>“Shootings can happen in public places.”</li>
+              <li>“I was afraid.”</li>
+              <li>“A man wore a backpack; maybe it had a weapon.”</li>
+              <li>“It might be hard to escape without drawing attention.”</li>
+            </ul>
+            <em>Evidence AGAINST:</em>
+            <ul>
+              <li>“I've been to the store many times; nothing bad happened.”</li>
+              <li>“Feeling afraid doesn't mean it’s actually dangerous.”</li>
+              <li>“A backpack doesn’t necessarily contain a gun.”</li>
+              <li>“Mass shootings are relatively rare events.”</li>
+            </ul>
+            </p>
+    </div>
+
+    <label for="evidenceFor">Evidence FOR this thought:</label>
+    <textarea id="evidenceFor" rows="3"></textarea>
+
+    <label for="evidenceAgainst">Evidence AGAINST this thought:</label>
+    <textarea id="evidenceAgainst" rows="3"></textarea>
+  </div>
+
+  <!-- STEP 5: MAKE A DECISION -->
+  <div class="card">
+    <h2>Step 5: Make a Decision</h2>
+    <button class="accordion-toggle" onclick="toggleAccordion('step5Accordion')">Show/Hide Step 5 Guidance</button>
+    <div id="step5Accordion" class="accordion-content">
+        <p><strong>Guidance:</strong>
+            <ul>
+              <li>Weigh the evidence carefully. If the thought is inaccurate, form a new, more accurate thought.</li>
+              <li>If the thought is accurate, outline an Action Plan to deal with the real situation.</li>
+              <li>Example (Inaccurate Thought): “Even though I'm anxious, it’s unlikely there’ll be a shooting. It’s safe to shop.”</li>
+              <li>Example (Accurate Thought): If it truly is a risky situation, create a plan or problem-solving steps.</li>
+            </ul>
+            </p>
+    </div>
+
+    <p>Is this thought accurate or inaccurate?</p>
+    <label>
+      <input type="radio" name="accuracy" value="Accurate" /> Accurate
+    </label><br>
+    <label>
+      <input type="radio" name="accuracy" value="Inaccurate" /> Inaccurate
+    </label><br><br>
+
+    <label for="newThought">
+      If inaccurate, write a new, more accurate thought.  
+      If accurate, outline an action plan to address the situation:
+    </label>
+    <textarea id="newThought" rows="3"></textarea>
+  </div>
+
+  <!-- EMAIL SECTION -->
+  <div class="card">
+    <h2>Send Results to Your Email</h2>
+    <label for="userEmail">Your Email Address:</label>
+    <input type="text" id="userEmail" placeholder="you@example.com" />
+
+    <button onclick="sendEmail()">Send Email with Your Results</button>
+    <p>(This will open your mail client so you can review and send.)</p>
+  </div>
+
+  <hr/>
+
+  <h2>Preview of Your Answers</h2>
+  <div id="previewArea"></div>
+</div><!-- .container -->
+
+<script>
+/* --------------------------
+   Toggle big instructions
+-------------------------- */
+function toggleInstructions() {
+  const content = document.getElementById("instructionsContent");
+  content.classList.toggle("open");
+}
+
+/* --------------------------
+   Toggle accordions
+-------------------------- */
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle("open");
+}
+
+/* --------------------------
+   Feeling Wheel Zoom
+-------------------------- */
+const wheelImg = document.getElementById("feelingWheelImage");
+wheelImg.addEventListener("click", () => {
+  wheelImg.classList.toggle("zoomed-in");
+});
+
+/* --------------------------
+   Show/hide additional feeling blocks
+-------------------------- */
+function showFeelingBlock(num) {
+  const block = document.getElementById(`feelingBlock${num}`);
+  block.classList.remove("hidden");
+
+  // If we just revealed block #2 or #3, hide the corresponding button
+  if (num === 2) {
+    document.getElementById("showBlock2Btn").classList.add("hidden");
+  } else if (num === 3) {
+    document.getElementById("showBlock3Btn").classList.add("hidden");
+  }
+}
+
+/* --------------------------
+   Sub-feelings data
+-------------------------- */
+const subFeelingsMap = {
+  fearAnxiety: [
+    "Helpless","Frightened","Panic","Hysterical","Inferior","Inadequate",
+    "Worried","Anxious","Apprehensive","Nervous","Scared","Terror"
+  ],
+  sadnessDepression: [
+    "Hurt","Depressed","Sorrow","Dismayed","Displeased","Regretful","Isolated",
+    "Lonely","Grief","Powerless","Neglected","Despair","Shameful","Disappointed"
+  ],
+  guiltShame: [
+    "Guilty","Ashamed","Remorseful","Embarrassed","Humiliated"
+  ],
+  anger: [
+    "Agitated","Hostile","Hate","Rage","Irritable","Frustrated","Jealous",
+    "Contempt","Resentful","Revolted","Aggravated"
+  ]
+};
+
+/* We have up to 3 sets of feelings; 
+   connect each "Broad Feeling" select to its "Sub-Feeling" select
+*/
+const feelingSelect1 = document.getElementById("feelingSelect1");
+const subFeelingSelect1 = document.getElementById("subFeelingSelect1");
+feelingSelect1.addEventListener("change", () => populateSubFeelings(feelingSelect1, subFeelingSelect1));
+
+const feelingSelect2 = document.getElementById("feelingSelect2");
+const subFeelingSelect2 = document.getElementById("subFeelingSelect2");
+feelingSelect2.addEventListener("change", () => populateSubFeelings(feelingSelect2, subFeelingSelect2));
+
+const feelingSelect3 = document.getElementById("feelingSelect3");
+const subFeelingSelect3 = document.getElementById("subFeelingSelect3");
+feelingSelect3.addEventListener("change", () => populateSubFeelings(feelingSelect3, subFeelingSelect3));
+
+
+function populateSubFeelings(broadSelect, subSelect) {
+  subSelect.innerHTML = '<option value="" disabled selected>Select...</option>';
+  const val = broadSelect.value;
+  if (subFeelingsMap[val]) {
+    subFeelingsMap[val].forEach(sf => {
+      const opt = document.createElement("option");
+      opt.value = sf;
+      opt.textContent = sf;
+      subSelect.appendChild(opt);
+    });
+    subSelect.disabled = false;
+  } else {
+    subSelect.disabled = true;
+  }
+}
+
+/* --------------------------
+   Building the summary + mailto
+-------------------------- */
+function buildSummary() {
+  // Step 1
+  const situation = document.getElementById("situationInput").value.trim();
+
+  // Step 2 (up to 3 feelings)
+  const feelingData = [];
+  // gather block 1 always
+  const broad1 = feelingSelect1.value || "(none)";
+  const sub1 = subFeelingSelect1.value || "(none)";
+  if (broad1 !== "(none)") {
+    feelingData.push(`Feeling #1: ${broad1}, Sub-Feeling: ${sub1}`);
+  }
+
+  // block 2 if it's visible
+  if (!document.getElementById("feelingBlock2").classList.contains("hidden")) {
+    const broad2 = feelingSelect2.value || "(none)";
+    const sub2 = subFeelingSelect2.value || "(none)";
+    if (broad2 !== "(none)") {
+      feelingData.push(`Feeling #2: ${broad2}, Sub-Feeling: ${sub2}`);
+    }
+  }
+
+  // block 3 if it's visible
+  if (!document.getElementById("feelingBlock3").classList.contains("hidden")) {
+    const broad3 = feelingSelect3.value || "(none)";
+    const sub3 = subFeelingSelect3.value || "(none)";
+    if (broad3 !== "(none)") {
+      feelingData.push(`Feeling #3: ${broad3}, Sub-Feeling: ${sub3}`);
+    }
+  }
+
+  // Step 3
+  const thought = document.getElementById("thoughtInput").value.trim();
+
+  // Step 4
+  const evidenceFor = document.getElementById("evidenceFor").value.trim();
+  const evidenceAgainst = document.getElementById("evidenceAgainst").value.trim();
+
+  // Step 5
+  const accuracyRadio = document.querySelector('input[name="accuracy"]:checked');
+  const accuracy = accuracyRadio ? accuracyRadio.value : "(none)";
+  const newThought = document.getElementById("newThought").value.trim();
+
+  return `
+STEP 1: The Situation
+---------------------
+${situation}
+
+STEP 2: The Feeling(s)
+----------------------
+${feelingData.length > 0 ? feelingData.join("\n") : "(No feelings selected)"}
+
+STEP 3: The Thought
+-------------------
+${thought}
+
+STEP 4: Evaluate the Thought
+----------------------------
+Evidence FOR: ${evidenceFor}
+
+Evidence AGAINST: ${evidenceAgainst}
+
+STEP 5: Make a Decision
+-----------------------
+Thought is: ${accuracy}
+New Thought / Action Plan: ${newThought}
+  `.trim();
+}
+
+function sendEmail() {
+  const summary = buildSummary();
+  document.getElementById("previewArea").textContent = summary;
+
+  const userEmail = document.getElementById("userEmail").value.trim();
+  if (!userEmail) {
+    alert("Please enter your email address first.");
+    return;
+  }
+
+  const subject = encodeURIComponent("Your CBT Questionnaire Results");
+  const body = encodeURIComponent(summary);
+
+  // mailto link
+  const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${subject}&body=${body}`;
+  window.location.href = mailtoLink; 
+}
+</script>
+</body>
+</html>

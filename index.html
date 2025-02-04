@@ -35,6 +35,7 @@
     label {
       display: block;
       margin: 0.5rem 0 0.2rem;
+      padding-bottom: 5px;
     }
     input[type="text"], select, textarea {
       width: 100%;
@@ -45,6 +46,10 @@
       background: #2a2a2a;
       color: #ffffff;
     }
+    textarea {
+        resize: vertical;
+    }
+ 
     button {
       background: #4CAF50;
       color: #ffffff;
@@ -78,6 +83,12 @@
       transition: max-height 1s ease-in;
     }
 
+    *,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
     /* 1) In your HTML <head>:
 -----------------------------------------------
 <link rel="stylesheet" 
@@ -89,14 +100,6 @@
 */
 
 /* Apply Nunito across the entire site */
-html, body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Nunito', sans-serif;
-  font-size: 18px; /* was 16px; bigger helps avoid iOS auto-zoom */
-  background: #121212;
-  color: #fff;
-}
 
 /* Ensure form elements inherit the same font */
 input, textarea, select, button {
@@ -593,10 +596,10 @@ h1, h2, h3, h4 {
     <p>Is this thought accurate or inaccurate?</p>
     <label>
       <input type="radio" name="accuracy" value="Accurate" /> Accurate
-    </label><br>
+    </label>
     <label>
       <input type="radio" name="accuracy" value="Inaccurate" /> Inaccurate
-    </label><br><br>
+    </label>
 
     <label for="newThought">
       If inaccurate, write a new, more accurate thought.  

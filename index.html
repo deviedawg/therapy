@@ -608,6 +608,10 @@ h1, h2, h3, h4 {
   <!-- EMAIL SECTION -->
   <div class="card">
     <h2>Send Results to Your Email</h2>
+
+    <label for="emailTitle">Email Title (Optional):</label>
+    <input type="text" id="emailTitle" placeholder="e.g. Grocery Store Anxiety" />
+
     <label for="userEmail">Your Email Address: </label>
     <input type="text" id="userEmail" placeholder="you@example.com" />
 
@@ -789,17 +793,29 @@ New Thought / Action Plan: ${newThought}
 function sendEmail() {
   const summary = buildSummary();
 
-  // Convert \n to CR+LF for some email clients (e.g. iOS Mail, Outlook):
+  // Convert \n to CR+LF for iOS/Outlook:
   const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
-  
+
+  // Get the user's email
   const userEmail = document.getElementById("userEmail").value.trim();
   if (!userEmail) {
     alert("Please enter your email address first.");
     return;
   }
 
-  const subject = encodeURIComponent("Your CBT Questionnaire Results");
-  const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${subject}&body=${safeBody}`;
+  // Get the optional title input
+  const customTitle = document.getElementById("emailTitle").value.trim();
+  // Use a default subject if no custom title is provided
+  let finalSubject = "Your CBT Questionnaire Results";
+  if (customTitle) {
+    // Combine or replace the entire subject. Example below appends:
+    finalSubject += ` - ${customTitle}`;
+  }
+
+  // Build the mailto link
+  const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${safeBody}`;
+
+  // Open the user's mail client
   window.location.href = mailtoLink;
 }
 

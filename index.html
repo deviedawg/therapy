@@ -36,6 +36,7 @@
       display: block;
       margin: 0.5rem 0 0.2rem;
       padding-bottom: 5px;
+      color: #bdbdbd;
     }
     input[type="text"], select, textarea {
       width: 100%;
@@ -61,13 +62,13 @@
       font-size: 1rem;
     }
     button:hover {
-      background: #45a049;
+      background: grey;
     }
     hr { margin: 2rem 0; border-color: #333; }
 
     /* Big instructions toggle */
-    .instructions-toggle {
-      background: #007acc;
+    .instructions-toggle, .send-email {
+      background: #005b9b;
       margin-bottom: 1rem;
     }
     .instructions-content {
@@ -118,7 +119,11 @@ h1, h2, h3, h4 {
   margin: 0;
   font-family: 'Nunito', sans-serif;
   font-weight: 700; /* or 400, 600, etc. */
-  color: #fff;
+}
+
+h2 {
+  color: rgb(75 200 250);
+
 }
 
 
@@ -177,7 +182,7 @@ h1, h2, h3, h4 {
 <body>
 <div class="container">
   <h1>Mental Health Questionnaire</h1>
-  <p>Fill out each step below. For Step 2, you can add up to three different feelings. When done, type in your email address and click “Send Email” to open your mail client with your answers pre‐filled.</p>
+  <!-- <p>Fill out each step below. For Step 2, you can add up to three different feelings. When done, type in your email address and click “Send Email” to open your mail client with your answers pre‐filled.</p> -->
 
   <!-- Big instructions block (collapsible) -->
   <button class="instructions-toggle" onclick="toggleInstructions()">
@@ -595,11 +600,9 @@ h1, h2, h3, h4 {
 
     <p>Is this thought accurate or inaccurate?</p>
     <label>
-      <input type="radio" name="accuracy" value="Accurate" /> Accurate
-    </label>
+      <input type="radio" name="accuracy" value="Accurate" />Accurate</label>
     <label>
-      <input type="radio" name="accuracy" value="Inaccurate" /> Inaccurate
-    </label>
+      <input type="radio" name="accuracy" value="Inaccurate" />Inaccurate</label>
 
     <label for="newThought">
       If inaccurate, write a new, more accurate thought.  
@@ -618,7 +621,7 @@ h1, h2, h3, h4 {
     <label for="userEmail">Your Email Address: </label>
     <input type="text" id="userEmail" placeholder="you@example.com" />
 
-    <button onclick="sendEmail()">Send Email with Your Results</button>
+    <button class="send-email" onclick="sendEmail()">Send Email with Your Results</button>
     <p>(This will open your mail client so you can review and send.)</p>
   </div>
 
@@ -645,13 +648,6 @@ function toggleAccordion(id) {
   el.classList.toggle("open");
 }
 
-/* --------------------------
-   Feeling Wheel Zoom
--------------------------- */
-const wheelImg = document.getElementById("feelingWheelImage");
-wheelImg.addEventListener("click", () => {
-  wheelImg.classList.toggle("zoomed-in");
-});
 
 /* --------------------------
    Show/hide additional feeling blocks

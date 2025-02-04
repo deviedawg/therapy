@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Mental Health Questionnaire (Multiple Feelings, Email Results)</title>
   <style>
     /* ----------------------------------
@@ -92,7 +93,7 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: 'Nunito', sans-serif;
-  font-size: 16px;
+  font-size: 18px; /* was 16px; bigger helps avoid iOS auto-zoom */
   background: #121212;
   color: #fff;
 }
@@ -787,8 +788,10 @@ New Thought / Action Plan: ${newThought}
 
 function sendEmail() {
   const summary = buildSummary();
-  document.getElementById("previewArea").textContent = summary;
 
+  // Convert \n to CR+LF for some email clients (e.g. iOS Mail, Outlook):
+  const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
+  
   const userEmail = document.getElementById("userEmail").value.trim();
   if (!userEmail) {
     alert("Please enter your email address first.");
@@ -796,12 +799,10 @@ function sendEmail() {
   }
 
   const subject = encodeURIComponent("Your CBT Questionnaire Results");
-  const body = encodeURIComponent(summary);
-
-  // mailto link
-  const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${subject}&body=${body}`;
-  window.location.href = mailtoLink; 
+  const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${subject}&body=${safeBody}`;
+  window.location.href = mailtoLink;
 }
+
 </script>
 </body>
 </html>

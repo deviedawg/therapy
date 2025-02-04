@@ -177,20 +177,12 @@ h2 {
 
     /* Hiding optional feelings initially */
     .hidden { display: none; }
-
-    /* Preview area */
-    #previewArea {
-      background: #2a2a2a;
-      padding: 1rem;
-      border-radius: 4px;
-      white-space: pre-wrap;
-      margin-top: 1rem;
-    }
   </style>
 </head>
 <body>
 <div class="container">
   <h1>COGNITIVE RESTRUCTURING</h1>
+  <br>
   <!-- <p>Fill out each step below. For Step 2, you can add up to three different feelings. When done, type in your email address and click “Send Email” to open your mail client with your answers pre‐filled.</p> -->
 
   <!-- Big instructions block (collapsible) -->
@@ -634,10 +626,7 @@ h2 {
     <p>(This will open your mail client so you can review and send.)</p>
   </div>
 
-  <hr/>
 
-  <h2>Preview of Your Answers</h2>
-  <div id="previewArea"></div>
 </div><!-- .container -->
 
 <script>
@@ -768,30 +757,39 @@ function buildSummary() {
   const newThought = document.getElementById("newThought").value.trim();
 
   return `
-<b><span style="color:blue;">STEP 1: The Situation</span></b><br>
-${situation}<br><br>
+**STEP 1: THE SITUATION**  
+=====================  
+${situation}
 
-<b><span style="color:blue;">STEP 2: The Feeling(s)</span></b><br>
-${feelingData.length > 0 ? feelingData.join("<br>") : "(No feelings selected)"}<br><br>
+**STEP 2: THE FEELING(S)**  
+=====================  
+${feelingData.length > 0 ? feelingData.join("\n") : "(No feelings selected)"}
 
-<b><span style="color:blue;">STEP 3: The Thought</span></b><br>
-${thought}<br><br>
+**STEP 3: THE THOUGHT**  
+=====================  
+${thought}
 
-<b><span style="color:blue;">STEP 4: Evaluate the Thought</span></b><br>
-<b>Evidence FOR:</b> ${evidenceFor}<br>
-<b>Evidence AGAINST:</b> ${evidenceAgainst}<br><br>
+**STEP 4: EVALUATE THE THOUGHT**  
+=====================  
+Evidence FOR:  
+${evidenceFor}
 
-<b><span style="color:blue;">STEP 5: Make a Decision</span></b><br>
-<b>Thought is:</b> ${accuracy}<br>
-<b>New Thought / Action Plan:</b> ${newThought}
+Evidence AGAINST:  
+${evidenceAgainst}
+
+**STEP 5: MAKE A DECISION**  
+=====================  
+Thought is: ${accuracy}  
+New Thought / Action Plan:  
+${newThought}
   `.trim();
 }
 
 function sendEmail() {
   const summary = buildSummary();
 
-  // Convert to mail-friendly HTML format
-  const safeBody = encodeURIComponent(summary.replace(/\n/g, "<br>"));
+  // Convert \n to CR+LF for better email formatting
+  const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
 
   // Get the user's email
   const userEmail = document.getElementById("userEmail").value.trim();
@@ -807,12 +805,13 @@ function sendEmail() {
     finalSubject += ` - ${customTitle}`;
   }
 
-  // Build the mailto link (Supports HTML emails)
+  // Build the mailto link
   const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${safeBody}`;
 
   // Open the user's mail client
   window.location.href = mailtoLink;
 }
+
 
 
 </script>

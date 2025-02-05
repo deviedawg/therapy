@@ -50,6 +50,10 @@
       margin-bottom: 15px;
     }
 
+    h3 {
+      margin-bottom: 5px !important;
+    }
+
     .distortion-desc {
       margin-top: 0;
     }
@@ -279,6 +283,29 @@ h2 {
   @media(max-width: 600px) {
     .distortion-grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  .evidence-row {
+    display: flex; 
+    flex-wrap: wrap; 
+    margin-bottom: 1rem;
+  }
+  .evidence-text {
+    flex: 1;
+    margin-right: 0.5rem;
+  }
+  .evidence-rating {
+    width: 70px;
+  }
+  /* On smaller screens, stack them */
+  @media (max-width: 600px) {
+    .evidence-row {
+      flex-direction: column;
+    }
+    .evidence-text {
+      margin-right: 0; 
+      margin-bottom: 0.5rem;
     }
   }
 
@@ -771,13 +798,43 @@ h2 {
             </p>
     </div>
 
-    <label for="evidenceFor">Evidence FOR this thought:</label>
+    <!-- <label for="evidenceFor">Evidence FOR this thought:</label>
     <textarea id="evidenceFor" rows="3"></textarea>
 
 
 
     <label for="evidenceAgainst">Evidence AGAINST this thought:</label>
-    <textarea id="evidenceAgainst" rows="3"></textarea>
+    <textarea id="evidenceAgainst" rows="3"></textarea> -->
+
+    <h3>Evidence FOR this thought</h3>
+    <div id="evidenceForContainer"></div>
+    <button class="send-email" onclick="addEvidenceForRow()">+ Add Evidence FOR</button>
+
+    <hr/>
+
+    <!-- EVIDENCE AGAINST BLOCK -->
+    <h3>Evidence AGAINST this thought</h3>
+    <button class="accordion-toggle" onclick="toggleAccordion('step6Accordion')">More ways to think about the thought</button>
+    <div id="distortionMessage" style="
+      color: #5ef939; 
+      font-weight: bold; 
+      margin: 0.5rem 0;
+    "></div>
+    <div id="step6Accordion" class="accordion-content">
+            <ul>
+              <li>Is there another way of looking at the situation?”</li>
+              <li>Is there an alternative explanation for what happened?</li>
+              <li>How would someone else think about the situation?</li>
+              <li>Is my concern based more on how I feel than the actual facts in the situation?</li>
+              <li>Am I placing unrealistic and unobtainable standards on myself that I would never expect other people to achieve?</li>
+              <li>Am I overestimating how much control and responsibility I have in this situation?</li>
+              <li>What would be the worst thing that could happen if my fear were true?</li>
+              <li>Am I not considering everything I can do to deal with the problem or situation?</li>
+              <li>Am I thinking that because a low-probability event happened to me, that it is very likely to happen again to me?</li>
+            </ul>
+    </div>
+    <div id="evidenceAgainstContainer"></div>
+    <button class="send-email" onclick="addEvidenceAgainstRow()">+ Add Evidence AGAINST</button>
   </div>
 
   <!-- STEP 5: MAKE A DECISION -->
@@ -920,347 +977,482 @@ h2 {
 </div>
 
 <script>
-/* --------------------------
-   Toggle big instructions
--------------------------- */
-function toggleInstructions() {
-  const content = document.getElementById("instructionsContent");
-  content.classList.toggle("open");
-}
-
-/* --------------------------
-   Toggle accordions
--------------------------- */
-function toggleAccordion(id) {
-  const el = document.getElementById(id);
-  el.classList.toggle("open");
-}
-
-
-/* --------------------------
-   Show/hide additional feeling blocks
--------------------------- */
-function showFeelingBlock(num) {
-  const block = document.getElementById(`feelingBlock${num}`);
-  block.classList.remove("hidden");
-
-  // If we just revealed block #2 or #3, hide the corresponding button
-  if (num === 2) {
-    document.getElementById("showBlock2Btn").classList.add("hidden");
-  } else if (num === 3) {
-    document.getElementById("showBlock3Btn").classList.add("hidden");
+  /* --------------------------
+     Toggle big instructions
+  -------------------------- */
+  function toggleInstructions() {
+    const content = document.getElementById("instructionsContent");
+    content.classList.toggle("open");
   }
-}
-
-/* --------------------------
-   Sub-feelings data
--------------------------- */
-const subFeelingsMap = {
-  fearAnxiety: [
-    "Helpless","Frightened","Panic","Hysterical","Inferior","Inadequate",
-    "Worried","Anxious","Apprehensive","Nervous","Scared","Terror"
-  ],
-  sadnessDepression: [
-    "Hurt","Depressed","Sorrow","Dismayed","Displeased","Regretful","Isolated",
-    "Lonely","Grief","Powerless","Neglected","Despair","Shameful","Disappointed"
-  ],
-  guiltShame: [
-    "Guilty","Ashamed","Remorseful","Embarrassed","Humiliated"
-  ],
-  anger: [
-    "Agitated","Hostile","Hate","Rage","Irritable","Frustrated","Jealous",
-    "Contempt","Resentful","Revolted","Aggravated"
-  ]
-};
-
-/* We have up to 3 sets of feelings; 
-   connect each "Broad Feeling" select to its "Sub-Feeling" select
-*/
-const feelingSelect1 = document.getElementById("feelingSelect1");
-const subFeelingSelect1 = document.getElementById("subFeelingSelect1");
-feelingSelect1.addEventListener("change", () => populateSubFeelings(feelingSelect1, subFeelingSelect1));
-
-const feelingSelect2 = document.getElementById("feelingSelect2");
-const subFeelingSelect2 = document.getElementById("subFeelingSelect2");
-feelingSelect2.addEventListener("change", () => populateSubFeelings(feelingSelect2, subFeelingSelect2));
-
-const feelingSelect3 = document.getElementById("feelingSelect3");
-const subFeelingSelect3 = document.getElementById("subFeelingSelect3");
-feelingSelect3.addEventListener("change", () => populateSubFeelings(feelingSelect3, subFeelingSelect3));
-
-
-function populateSubFeelings(broadSelect, subSelect) {
-  subSelect.innerHTML = '<option value="" disabled selected>Select...</option>';
-  const val = broadSelect.value;
-  if (subFeelingsMap[val]) {
-    subFeelingsMap[val].forEach(sf => {
-      const opt = document.createElement("option");
-      opt.value = sf;
-      opt.textContent = sf;
-      subSelect.appendChild(opt);
-    });
-    subSelect.disabled = false;
-  } else {
-    subSelect.disabled = true;
-  }
-}
-
-/* --------------------------
-   Modal for distortions
--------------------------- */
-function openDistortionsModal() {
-  document.getElementById("distortionsModal").style.display = "block";
-}
-
-function closeDistortionsModal() {
-  document.getElementById("distortionsModal").style.display = "none";
-}
-
-/* Gather any selected distortions */
-function getSelectedDistortions() {
-  const checks = document.querySelectorAll('.distortion-grid input[type="checkbox"]:checked');
-  const selected = [];
-  checks.forEach(ch => {
-    selected.push(ch.value);
-  });
-  return selected;
-}
-
-/* --------------------------
-   Building the summary + mailto
--------------------------- */
-function buildSummary() {
-  // Step 1
-  const situation = document.getElementById("situationInput").value.trim();
-
-  const thoughtsData = getAllThoughts();
-  let step3Text = "(No thoughts entered)";
-  if (thoughtsData.length > 0) {
-    step3Text = thoughtsData
-      .map((obj, idx) => `Thought #${idx+1}: ${obj.thought} (Distress: ${obj.distress})`)
-      .join("\n");
-  }
-
   
-  // Step 2 (up to 3 feelings)
-  const feelingData = [];
-  const broad1 = feelingSelect1.value || "(none)";
-  const sub1 = subFeelingSelect1.value || "(none)";
-  if (broad1 !== "(none)") {
-    feelingData.push(`Feeling #1: ${broad1}, Sub-Feeling: ${sub1}`);
+  /* --------------------------
+     Toggle accordions
+  -------------------------- */
+  function toggleAccordion(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle("open");
   }
-  if (!document.getElementById("feelingBlock2").classList.contains("hidden")) {
-    const broad2 = feelingSelect2.value || "(none)";
-    const sub2 = subFeelingSelect2.value || "(none)";
-    if (broad2 !== "(none)") {
-      feelingData.push(`Feeling #2: ${broad2}, Sub-Feeling: ${sub2}`);
-    }
-  }
-  if (!document.getElementById("feelingBlock3").classList.contains("hidden")) {
-    const broad3 = feelingSelect3.value || "(none)";
-    const sub3 = subFeelingSelect3.value || "(none)";
-    if (broad3 !== "(none)") {
-      feelingData.push(`Feeling #3: ${broad3}, Sub-Feeling: ${sub3}`);
-    }
-  }
-
-  // Step 3
-  const thought = document.getElementById("thoughtInput").value.trim();
-
-  // Step 4
-  const evidenceFor = document.getElementById("evidenceFor").value.trim();
-  const evidenceAgainst = document.getElementById("evidenceAgainst").value.trim();
-  // Distortions chosen
-  const distortionsSelected = getSelectedDistortions();
-  const distortionsString = distortionsSelected.length 
-    ? "Problematic Styles Chosen:\n" + distortionsSelected.join(", ") 
-    : "(No problematic thinking styles selected)";
-
-  // Step 5
-  const accuracyRadio = document.querySelector('input[name="accuracy"]:checked');
-  const accuracy = accuracyRadio ? accuracyRadio.value : "(none)";
-  const newThought = document.getElementById("newThought").value.trim();
-
-  return `
-**STEP 1: THE SITUATION**
-=====================
-${situation}
-
-**STEP 2: THE FEELING(S)**
-=====================
-${feelingData.length > 0 ? feelingData.join("\n") : "(No feelings selected)"}
-
-**STEP 3: THE THOUGHT**
-=====================
-${step3Text}
-
-**STEP 4: EVALUATE THE THOUGHT**
-=====================
-${distortionsString}
-
-Evidence FOR:
-${evidenceFor}
-
-Evidence AGAINST:
-${evidenceAgainst}
-
-**STEP 5: MAKE A DECISION**
-=====================
-Thought is: ${accuracy}
-New Thought / Action Plan:
-${newThought}
-  `.trim();
-}
-
-function sendEmail() {
-  const summary = buildSummary();
-  const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
-
-  // Get the user's email
-  const userEmail = document.getElementById("userEmail").value.trim();
-  if (!userEmail) {
-    alert("Please enter your email address first.");
-    return;
-  }
-
-  // Get the optional title input
-  const customTitle = document.getElementById("emailTitle").value.trim();
-  let finalSubject = "Your CBT Questionnaire Results";
-  if (customTitle) {
-    finalSubject += ` - ${customTitle}`;
-  }
-
-  // Build the mailto link
-  const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${safeBody}`;
-
-  // Open the user's mail client
-  window.location.href = mailtoLink;
-}
-
-document.querySelectorAll('.distortion-grid input[type="checkbox"]').forEach(ch => {
-  ch.addEventListener('change', updateDistortionsList);
-});
-
-function updateDistortionsList() {
-  const selected = getSelectedDistortions(); // you already have this helper
-  const container = document.getElementById("chosenDistortions");
   
-  if (selected.length) {
-    // Join them with commas or line breaks—whatever you prefer
-    container.textContent = "Selected Distortions: " + selected.join(", ");
-  } else {
-    // Clear if nothing is selected
-    container.textContent = "";
-  }
-}
-
-function highlightHighestPriority() {
-  const blockIds = [1,2,3];
-  let maxPriority = 0;
-  const blocksData = [];
-
-  // Gather each visible block's priority
-  blockIds.forEach(num => {
+  /* --------------------------
+     Show/hide additional feeling blocks
+  -------------------------- */
+  function showFeelingBlock(num) {
     const block = document.getElementById(`feelingBlock${num}`);
-    // If this block is visible (not hidden)
-    if (!block.classList.contains("hidden")) {
-      const val = parseInt(document.getElementById(`priorityScale${num}`).value) || 0;
-      blocksData.push({ block, priority: val });
+    block.classList.remove("hidden");
+  
+    // Hide the "Add Another Feeling" button once a block is revealed
+    if (num === 2) {
+      document.getElementById("showBlock2Btn").classList.add("hidden");
+    } else if (num === 3) {
+      document.getElementById("showBlock3Btn").classList.add("hidden");
     }
-  });
-
-  // Find the maximum priority among them
-  if (blocksData.length) {
-    maxPriority = Math.max(...blocksData.map(item => item.priority));
   }
-
-  // Reset all, then highlight any block(s) that match the max
-  blocksData.forEach(item => {
-    // Reset styling first
-    item.block.style.border = "none";
-    item.block.style.backgroundColor = "";
-
-    if (item.priority === maxPriority && maxPriority > 0) {
-      // Give it a green border (and optional background)
-      item.block.style.border = "2px solid #5ef939";
-      item.block.style.backgroundColor = "#1b3c1b"; 
+  
+  /* --------------------------
+     Sub-feelings data + select logic
+  -------------------------- */
+  const subFeelingsMap = {
+    fearAnxiety: [
+      "Helpless","Frightened","Panic","Hysterical","Inferior","Inadequate",
+      "Worried","Anxious","Apprehensive","Nervous","Scared","Terror"
+    ],
+    sadnessDepression: [
+      "Hurt","Depressed","Sorrow","Dismayed","Displeased","Regretful","Isolated",
+      "Lonely","Grief","Powerless","Neglected","Despair","Shameful","Disappointed"
+    ],
+    guiltShame: [
+      "Guilty","Ashamed","Remorseful","Embarrassed","Humiliated"
+    ],
+    anger: [
+      "Agitated","Hostile","Hate","Rage","Irritable","Frustrated","Jealous",
+      "Contempt","Resentful","Revolted","Aggravated"
+    ]
+  };
+  
+  const feelingSelect1 = document.getElementById("feelingSelect1");
+  const subFeelingSelect1 = document.getElementById("subFeelingSelect1");
+  feelingSelect1.addEventListener("change", () => populateSubFeelings(feelingSelect1, subFeelingSelect1));
+  
+  const feelingSelect2 = document.getElementById("feelingSelect2");
+  const subFeelingSelect2 = document.getElementById("subFeelingSelect2");
+  feelingSelect2.addEventListener("change", () => populateSubFeelings(feelingSelect2, subFeelingSelect2));
+  
+  const feelingSelect3 = document.getElementById("feelingSelect3");
+  const subFeelingSelect3 = document.getElementById("subFeelingSelect3");
+  feelingSelect3.addEventListener("change", () => populateSubFeelings(feelingSelect3, subFeelingSelect3));
+  
+  function populateSubFeelings(broadSelect, subSelect) {
+    subSelect.innerHTML = '<option value="" disabled selected>Select...</option>';
+    const val = broadSelect.value;
+    if (subFeelingsMap[val]) {
+      subFeelingsMap[val].forEach(sf => {
+        const opt = document.createElement("option");
+        opt.value = sf;
+        opt.textContent = sf;
+        subSelect.appendChild(opt);
+      });
+      subSelect.disabled = false;
+    } else {
+      subSelect.disabled = true;
     }
+  }
+  
+  /* --------------------------
+     Distortions modal
+  -------------------------- */
+  function openDistortionsModal() {
+    document.getElementById("distortionsModal").style.display = "block";
+  }
+  function closeDistortionsModal() {
+    document.getElementById("distortionsModal").style.display = "none";
+  }
+  
+  /* Gather any selected distortions */
+  function getSelectedDistortions() {
+    const checks = document.querySelectorAll('.distortion-grid input[type="checkbox"]:checked');
+    const selected = [];
+    checks.forEach(ch => {
+      selected.push(ch.value);
+    });
+    return selected;
+  }
+  
+  /* Show which distortions were selected */
+  document.querySelectorAll('.distortion-grid input[type="checkbox"]').forEach(ch => {
+    ch.addEventListener('change', updateDistortionsList);
   });
+  function updateDistortionsList() {
+  const selected = getSelectedDistortions(); // your existing helper
+  const container = document.getElementById("chosenDistortions");
+  const distortionMsg = document.getElementById("distortionMessage");
+
+  if (selected.length) {
+    // For the "selected distortions" line
+    container.textContent = "Selected Distortions: " + selected.join(", ");
+
+    // For the special message under "Evidence AGAINST"
+    distortionMsg.innerHTML = `
+      You chose some distortions:
+      <strong>${selected.join(", ")}</strong><br/>
+      This means you may already believe the thought to be inaccurate.
+      Ask yourself <em>why</em>.
+    `;
+  } else {
+    // Clear both if none selected
+    container.textContent = "";
+    distortionMsg.innerHTML = "";
+  }
 }
 
-function addThoughtRow() {
-  const container = document.getElementById('thoughtContainer');
-
-  // Create the row wrapper
-  const row = document.createElement('div');
-  row.className = 'thought-row';
-
-  // Text input
-  const textInput = document.createElement('input');
-  textInput.type = 'text';
-  textInput.className = 'thought-text';
-  textInput.placeholder = 'Enter a thought...';
-
-  // Rating input
-  const ratingInput = document.createElement('input');
-  ratingInput.type = 'number';
-  ratingInput.min = '1';
-  ratingInput.max = '10';
-  ratingInput.step = '1';
-  ratingInput.className = 'thought-rating';
-  ratingInput.placeholder = '1-10';
-  ratingInput.oninput = highlightMostDistressingThought;
-
-  // Append them
-  row.appendChild(textInput);
-  row.appendChild(ratingInput);
-
-  container.appendChild(row);
-}
-
-// Highlight the row(s) with the highest rating in red
-function highlightMostDistressingThought() {
-  const rows = document.querySelectorAll('#thoughtContainer .thought-row');
-
-  // Gather all ratings & find max
-  let maxRating = 0;
-  rows.forEach(r => {
-    const ratingVal = parseInt(r.querySelector('.thought-rating').value) || 0;
-    if (ratingVal > maxRating) {
-      maxRating = ratingVal;
+  /* --------------------------
+     Priority highlighting
+  -------------------------- */
+  function highlightHighestPriority() {
+    const blockIds = [1,2,3];
+    let maxPriority = 0;
+    const blocksData = [];
+  
+    // Gather each visible block's priority
+    blockIds.forEach(num => {
+      const block = document.getElementById(`feelingBlock${num}`);
+      if (!block.classList.contains("hidden")) {
+        const val = parseInt(document.getElementById(`priorityScale${num}`).value) || 0;
+        blocksData.push({ block, priority: val });
+      }
+    });
+  
+    // Find the max
+    if (blocksData.length) {
+      maxPriority = Math.max(...blocksData.map(item => item.priority));
     }
-  });
-
-  // Reset styles, then highlight the row(s) that match the max rating
-  rows.forEach(r => {
-    r.style.backgroundColor = '';        // reset
-    r.style.border = 'none';             // reset
-
-    const ratingVal = parseInt(r.querySelector('.thought-rating').value) || 0;
-    if (ratingVal === maxRating && maxRating > 0) {
-      r.style.border = '2px solid red';
-      r.style.backgroundColor = '#3b1c1c'; // optional darker red BG
+  
+    // Reset styling, highlight blocks that match the max
+    blocksData.forEach(item => {
+      item.block.style.border = "none";
+      item.block.style.backgroundColor = "";
+      if (item.priority === maxPriority && maxPriority > 0) {
+        item.block.style.border = "2px solid #5ef939";
+        item.block.style.backgroundColor = "#1b3c1b"; 
+      }
+    });
+  }
+  
+  /* --------------------------
+     Thoughts (multiple) logic
+  -------------------------- */
+  function addThoughtRow() {
+    const container = document.getElementById('thoughtContainer');
+    const row = document.createElement('div');
+    row.className = 'thought-row';
+  
+    // Thought text
+    const textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.className = 'thought-text';
+    textInput.placeholder = 'Enter a thought...';
+  
+    // Distress rating
+    const ratingInput = document.createElement('input');
+    ratingInput.type = 'number';
+    ratingInput.min = '1';
+    ratingInput.max = '10';
+    ratingInput.step = '1';
+    ratingInput.className = 'thought-rating';
+    ratingInput.placeholder = '1-10';
+    ratingInput.oninput = highlightMostDistressingThought;
+  
+    row.appendChild(textInput);
+    row.appendChild(ratingInput);
+    container.appendChild(row);
+  }
+  
+  // Highlight the row(s) with the highest rating in red
+  function highlightMostDistressingThought() {
+    const rows = document.querySelectorAll('#thoughtContainer .thought-row');
+    let maxRating = 0;
+  
+    // find max
+    rows.forEach(r => {
+      const val = parseInt(r.querySelector('.thought-rating').value) || 0;
+      if (val > maxRating) {
+        maxRating = val;
+      }
+    });
+  
+    // reset
+    rows.forEach(r => {
+      r.style.border = 'none';
+      r.style.backgroundColor = '';
+      const val = parseInt(r.querySelector('.thought-rating').value) || 0;
+      if (val === maxRating && maxRating > 0) {
+        r.style.border = '2px solid red';
+        r.style.backgroundColor = '#3b1c1c';
+      }
+    });
+  }
+  
+  // Collect them for Step 3 in the final email
+  function getAllThoughts() {
+    const rows = document.querySelectorAll('#thoughtContainer .thought-row');
+    const data = [];
+    rows.forEach(r => {
+      const thoughtValue = r.querySelector('.thought-text').value.trim();
+      const ratingValue = r.querySelector('.thought-rating').value.trim();
+      if (thoughtValue) {
+        data.push({ thought: thoughtValue, distress: ratingValue });
+      }
+    });
+    return data;
+  }
+  
+  /* --------------------------
+     Evidence FOR logic
+  -------------------------- */
+  function addEvidenceForRow() {
+    const container = document.getElementById('evidenceForContainer');
+    const row = document.createElement('div');
+    row.className = 'evidence-row';
+  
+    const textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.className = 'evidence-text';
+    textInput.placeholder = 'Evidence FOR...';
+  
+    const ratingInput = document.createElement('input');
+    ratingInput.type = 'number';
+    ratingInput.min = '1';
+    ratingInput.max = '10';
+    ratingInput.step = '1';
+    ratingInput.className = 'evidence-rating';
+    ratingInput.placeholder = '1-10';
+    ratingInput.oninput = highlightHighestFor;
+  
+    row.appendChild(textInput);
+    row.appendChild(ratingInput);
+    container.appendChild(row);
+  }
+  
+  function highlightHighestFor() {
+    const rows = document.querySelectorAll('#evidenceForContainer .evidence-row');
+    let maxVal = 0;
+    // find max
+    rows.forEach(r => {
+      const val = parseInt(r.querySelector('.evidence-rating').value) || 0;
+      if (val > maxVal) maxVal = val;
+    });
+    // reset
+    rows.forEach(r => {
+      r.style.border = 'none';
+      r.style.backgroundColor = '';
+      const val = parseInt(r.querySelector('.evidence-rating').value) || 0;
+      if (val === maxVal && maxVal > 0) {
+        r.style.border = '2px solid #007bff';
+        r.style.backgroundColor = 'rgba(0,123,255,0.2)';
+      }
+    });
+  }
+  
+  function getAllEvidenceFor() {
+    const rows = document.querySelectorAll('#evidenceForContainer .evidence-row');
+    const data = [];
+    rows.forEach(r => {
+      const textVal = r.querySelector('.evidence-text').value.trim();
+      const ratingVal = r.querySelector('.evidence-rating').value.trim();
+      if (textVal) {
+        data.push({ text: textVal, rating: ratingVal });
+      }
+    });
+    return data;
+  }
+  
+  /* --------------------------
+     Evidence AGAINST logic
+  -------------------------- */
+  function addEvidenceAgainstRow() {
+    const container = document.getElementById('evidenceAgainstContainer');
+    const row = document.createElement('div');
+    row.className = 'evidence-row';
+  
+    const textInput = document.createElement('input');
+    textInput.type = 'text';
+    textInput.className = 'evidence-text';
+    textInput.placeholder = 'Evidence AGAINST...';
+  
+    const ratingInput = document.createElement('input');
+    ratingInput.type = 'number';
+    ratingInput.min = '1';
+    ratingInput.max = '10';
+    ratingInput.step = '1';
+    ratingInput.className = 'evidence-rating';
+    ratingInput.placeholder = '1-10';
+    ratingInput.oninput = highlightHighestAgainst;
+  
+    row.appendChild(textInput);
+    row.appendChild(ratingInput);
+    container.appendChild(row);
+  }
+  
+  function highlightHighestAgainst() {
+    const rows = document.querySelectorAll('#evidenceAgainstContainer .evidence-row');
+    let maxVal = 0;
+    // find max
+    rows.forEach(r => {
+      const val = parseInt(r.querySelector('.evidence-rating').value) || 0;
+      if (val > maxVal) maxVal = val;
+    });
+    // reset
+    rows.forEach(r => {
+      r.style.border = 'none';
+      r.style.backgroundColor = '';
+      const val = parseInt(r.querySelector('.evidence-rating').value) || 0;
+      if (val === maxVal && maxVal > 0) {
+        r.style.border = '2px solid #cc33cc';
+        r.style.backgroundColor = 'rgba(204,51,204,0.2)';
+      }
+    });
+  }
+  
+  function getAllEvidenceAgainst() {
+    const rows = document.querySelectorAll('#evidenceAgainstContainer .evidence-row');
+    const data = [];
+    rows.forEach(r => {
+      const textVal = r.querySelector('.evidence-text').value.trim();
+      const ratingVal = r.querySelector('.evidence-rating').value.trim();
+      if (textVal) {
+        data.push({ text: textVal, rating: ratingVal });
+      }
+    });
+    return data;
+  }
+  
+  /* --------------------------
+     Build final summary + send email
+  -------------------------- */
+  function buildSummary() {
+    // STEP 1
+    const situation = document.getElementById("situationInput").value.trim();
+  
+    // STEP 2
+    const feelingData = [];
+    // Feeling #1
+    const broad1 = feelingSelect1.value || "(none)";
+    const sub1 = subFeelingSelect1.value || "(none)";
+    if (broad1 !== "(none)") {
+      feelingData.push(`Feeling #1: ${broad1}, Sub-Feeling: ${sub1}`);
     }
-  });
-}
-
-// Called by buildSummary() or your final email function
-function getAllThoughts() {
-  const rows = document.querySelectorAll('#thoughtContainer .thought-row');
-  const allData = [];
-
-  rows.forEach((row, index) => {
-    const thoughtValue = row.querySelector('.thought-text').value.trim();
-    const ratingValue = row.querySelector('.thought-rating').value.trim();
-    if (thoughtValue) {
-      allData.push({ thought: thoughtValue, distress: ratingValue });
+    // Feeling #2
+    if (!document.getElementById("feelingBlock2").classList.contains("hidden")) {
+      const broad2 = feelingSelect2.value || "(none)";
+      const sub2 = subFeelingSelect2.value || "(none)";
+      if (broad2 !== "(none)") {
+        feelingData.push(`Feeling #2: ${broad2}, Sub-Feeling: ${sub2}`);
+      }
     }
-  });
-
-  return allData;
-}
-
-
-</script>
+    // Feeling #3
+    if (!document.getElementById("feelingBlock3").classList.contains("hidden")) {
+      const broad3 = feelingSelect3.value || "(none)";
+      const sub3 = subFeelingSelect3.value || "(none)";
+      if (broad3 !== "(none)") {
+        feelingData.push(`Feeling #3: ${broad3}, Sub-Feeling: ${sub3}`);
+      }
+    }
+  
+    // STEP 3 (multiple thoughts)
+    const thoughtsData = getAllThoughts();
+    let step3Text = "(No thoughts entered)";
+    if (thoughtsData.length > 0) {
+      step3Text = thoughtsData
+        .map((obj, idx) => `Thought #${idx+1}: ${obj.thought} (Distress: ${obj.distress})`)
+        .join("\n");
+    }
+  
+    // STEP 4
+    // Distortions chosen
+    const distortionsSelected = getSelectedDistortions();
+    const distortionsString = distortionsSelected.length 
+      ? "Problematic Styles Chosen:\n" + distortionsSelected.join(", ")
+      : "(No problematic thinking styles selected)";
+  
+    // Gather Evidence FOR
+    const forData = getAllEvidenceFor();
+    let evidenceForText = "(No Evidence FOR added)";
+    if (forData.length > 0) {
+      evidenceForText = forData
+        .map((obj, idx) => `FOR #${idx+1}: ${obj.text} (Severity: ${obj.rating})`)
+        .join("\n");
+    }
+  
+    // Gather Evidence AGAINST
+    const againstData = getAllEvidenceAgainst();
+    let evidenceAgainstText = "(No Evidence AGAINST added)";
+    if (againstData.length > 0) {
+      evidenceAgainstText = againstData
+        .map((obj, idx) => `AGAINST #${idx+1}: ${obj.text} (Severity: ${obj.rating})`)
+        .join("\n");
+    }
+  
+    // STEP 5
+    const accuracyRadio = document.querySelector('input[name="accuracy"]:checked');
+    const accuracy = accuracyRadio ? accuracyRadio.value : "(none)";
+    const newThought = document.getElementById("newThought").value.trim();
+  
+    // Build final text
+    return `
+  **STEP 1: THE SITUATION**
+  =====================
+  ${situation}
+  
+  **STEP 2: THE FEELING(S)**
+  =====================
+  ${feelingData.length > 0 ? feelingData.join("\n") : "(No feelings selected)"}
+  
+  **STEP 3: THE THOUGHT(S)**
+  =====================
+  ${step3Text}
+  
+  **STEP 4: EVALUATE THE THOUGHT**
+  =====================
+  ${distortionsString}
+  
+  EVIDENCE FOR:
+  ${evidenceForText}
+  
+  EVIDENCE AGAINST:
+  ${evidenceAgainstText}
+  
+  **STEP 5: MAKE A DECISION**
+  =====================
+  Thought is: ${accuracy}
+  New Thought / Action Plan:
+  ${newThought}
+    `.trim();
+  }
+  
+  function sendEmail() {
+    const summary = buildSummary();
+    const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
+  
+    // Get the user's email
+    const userEmail = document.getElementById("userEmail").value.trim();
+    if (!userEmail) {
+      alert("Please enter your email address first.");
+      return;
+    }
+  
+    // Subject line
+    const customTitle = document.getElementById("emailTitle").value.trim();
+    let finalSubject = "Your CBT Questionnaire Results";
+    if (customTitle) {
+      finalSubject += ` - ${customTitle}`;
+    }
+  
+    // mailto link
+    const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${safeBody}`;
+  
+    // Open mail client
+    window.location.href = mailtoLink;
+  }
+  </script>
+  
 </body>
 </html>

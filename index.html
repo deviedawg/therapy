@@ -114,7 +114,7 @@
       transition: max-height 1s ease-in;
     }
 
-    .evidence-textarea {
+    .thought-textarea, .evidence-textarea {
       display: block;
       width: 100%;
       /* Start small, will auto-grow as user types */
@@ -1160,30 +1160,36 @@ h2 {
      Thoughts (multiple) logic
   -------------------------- */
   function addThoughtRow() {
-    const container = document.getElementById('thoughtContainer');
-    const row = document.createElement('div');
-    row.className = 'thought-row';
-  
-    // Thought text
-    const textInput = document.createElement('input');
-    textInput.type = 'text';
-    textInput.className = 'thought-text';
-    textInput.placeholder = 'Enter a thought...';
-  
-    // Distress rating
-    const ratingInput = document.createElement('input');
-    ratingInput.type = 'number';
-    ratingInput.min = '1';
-    ratingInput.max = '10';
-    ratingInput.step = '1';
-    ratingInput.className = 'thought-rating';
-    ratingInput.placeholder = '1-10';
-    ratingInput.oninput = highlightMostDistressingThought;
-  
-    row.appendChild(textInput);
-    row.appendChild(ratingInput);
-    container.appendChild(row);
-  }
+  const container = document.getElementById('thoughtContainer');
+  const row = document.createElement('div');
+  row.className = 'thought-row';
+
+  // Create a TEXTAREA instead of an <input type="text">
+  const textArea = document.createElement('textarea');
+  textArea.className = 'thought-text thought-textarea';
+  textArea.placeholder = 'Enter a thought...';
+
+  // Make it auto-expand
+  textArea.addEventListener('input', autoResize);
+
+  // Distress rating remains the same
+  const ratingInput = document.createElement('input');
+  ratingInput.type = 'number';
+  ratingInput.min = '1';
+  ratingInput.max = '10';
+  ratingInput.step = '1';
+  ratingInput.className = 'thought-rating';
+  ratingInput.placeholder = '1-10';
+  ratingInput.oninput = highlightMostDistressingThought;
+
+  // Append them
+  row.appendChild(textArea);
+  row.appendChild(ratingInput);
+  container.appendChild(row);
+
+  // Immediately size the new textarea
+  autoResize({ target: textArea });
+}
   
   // Highlight the row(s) with the highest rating in red
   function highlightMostDistressingThought() {
@@ -1212,17 +1218,19 @@ h2 {
   
   // Collect them for Step 3 in the final email
   function getAllThoughts() {
-    const rows = document.querySelectorAll('#thoughtContainer .thought-row');
-    const data = [];
-    rows.forEach(r => {
-      const thoughtValue = r.querySelector('.thought-text').value.trim();
-      const ratingValue = r.querySelector('.thought-rating').value.trim();
-      if (thoughtValue) {
-        data.push({ thought: thoughtValue, distress: ratingValue });
-      }
-    });
-    return data;
-  }
+  const rows = document.querySelectorAll('#thoughtContainer .thought-row');
+  const data = [];
+  rows.forEach(r => {
+    // It's still .thought-text
+    const thoughtValue = r.querySelector('.thought-text').value.trim();
+    const ratingValue = r.querySelector('.thought-rating').value.trim();
+    if (thoughtValue) {
+      data.push({ thought: thoughtValue, distress: ratingValue });
+    }
+  });
+  return data;
+}
+
   
   /* --------------------------
      Evidence FOR logic

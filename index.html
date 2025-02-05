@@ -114,6 +114,25 @@
       transition: max-height 1s ease-in;
     }
 
+    .evidence-textarea {
+      display: block;
+      width: 100%;
+      /* Start small, will auto-grow as user types */
+      min-height: 40px;
+
+      background: #2a2a2a;
+      color: #ffffff;
+      border: 1px solid #333;
+      border-radius: 4px;
+      margin-bottom: 0.8rem;
+      padding: 0.5rem;
+
+      /* Turn off manual drag‐resizing and scrollbars,
+        because we’re auto‐resizing in JS */
+      resize: none;
+      overflow: hidden;
+    }
+
     *,
 *::before,
 *::after {
@@ -1209,28 +1228,40 @@ h2 {
      Evidence FOR logic
   -------------------------- */
   function addEvidenceForRow() {
-    const container = document.getElementById('evidenceForContainer');
-    const row = document.createElement('div');
-    row.className = 'evidence-row';
-  
-    const textInput = document.createElement('input');
-    textInput.type = 'text';
-    textInput.className = 'evidence-text';
-    textInput.placeholder = 'Evidence FOR...';
-  
-    const ratingInput = document.createElement('input');
-    ratingInput.type = 'number';
-    ratingInput.min = '1';
-    ratingInput.max = '10';
-    ratingInput.step = '1';
-    ratingInput.className = 'evidence-rating';
-    ratingInput.placeholder = '1-10';
-    ratingInput.oninput = highlightHighestFor;
-  
-    row.appendChild(textInput);
-    row.appendChild(ratingInput);
-    container.appendChild(row);
-  }
+  const container = document.getElementById('evidenceForContainer');
+  const row = document.createElement('div');
+  row.className = 'evidence-row';
+
+  // Create a TEXTAREA with both classes:
+  const textArea = document.createElement('textarea');
+  textArea.className = 'evidence-text evidence-textarea';
+  textArea.placeholder = 'Evidence FOR...';
+
+  // Attach the autoResize function on each input event:
+  textArea.addEventListener('input', autoResize);
+
+  // Keep your rating input the same:
+  const ratingInput = document.createElement('input');
+  ratingInput.type = 'number';
+  ratingInput.min = '1';
+  ratingInput.max = '10';
+  ratingInput.step = '1';
+  ratingInput.className = 'evidence-rating';
+  ratingInput.placeholder = '1-10';
+  ratingInput.oninput = highlightHighestFor;
+
+  // Append both elements to row
+  row.appendChild(textArea);
+  row.appendChild(ratingInput);
+
+  // Append row to container
+  container.appendChild(row);
+
+  // Immediately call autoResize() so the textarea starts at proper height
+  autoResize({ target: textArea });
+}
+
+
   
   function highlightHighestFor() {
     const rows = document.querySelectorAll('#evidenceForContainer .evidence-row');
@@ -1251,46 +1282,58 @@ h2 {
       }
     });
   }
+
+  function autoResize(e) {
+    const textArea = e.target;
+    // Reset the height to auto so scrollHeight is correct
+    textArea.style.height = 'auto';
+    // Set it to the scroll height, so it grows to fit
+    textArea.style.height = textArea.scrollHeight + 'px';
+  }
   
   function getAllEvidenceFor() {
-    const rows = document.querySelectorAll('#evidenceForContainer .evidence-row');
-    const data = [];
-    rows.forEach(r => {
-      const textVal = r.querySelector('.evidence-text').value.trim();
-      const ratingVal = r.querySelector('.evidence-rating').value.trim();
-      if (textVal) {
-        data.push({ text: textVal, rating: ratingVal });
-      }
-    });
-    return data;
-  }
+  const rows = document.querySelectorAll('#evidenceForContainer .evidence-row');
+  const data = [];
+  rows.forEach(r => {
+    // STILL references ".evidence-text" (this is why we gave our <textarea> that class too!)
+    const textVal = r.querySelector('.evidence-text').value.trim();
+    const ratingVal = r.querySelector('.evidence-rating').value.trim();
+    if (textVal) {
+      data.push({ text: textVal, rating: ratingVal });
+    }
+  });
+  return data;
+}
   
   /* --------------------------
      Evidence AGAINST logic
   -------------------------- */
   function addEvidenceAgainstRow() {
-    const container = document.getElementById('evidenceAgainstContainer');
-    const row = document.createElement('div');
-    row.className = 'evidence-row';
-  
-    const textInput = document.createElement('input');
-    textInput.type = 'text';
-    textInput.className = 'evidence-text';
-    textInput.placeholder = 'Evidence AGAINST...';
-  
-    const ratingInput = document.createElement('input');
-    ratingInput.type = 'number';
-    ratingInput.min = '1';
-    ratingInput.max = '10';
-    ratingInput.step = '1';
-    ratingInput.className = 'evidence-rating';
-    ratingInput.placeholder = '1-10';
-    ratingInput.oninput = highlightHighestAgainst;
-  
-    row.appendChild(textInput);
-    row.appendChild(ratingInput);
-    container.appendChild(row);
-  }
+  const container = document.getElementById('evidenceAgainstContainer');
+  const row = document.createElement('div');
+  row.className = 'evidence-row';
+
+  const textArea = document.createElement('textarea');
+  textArea.className = 'evidence-text evidence-textarea';
+  textArea.placeholder = 'Evidence AGAINST...';
+
+  textArea.addEventListener('input', autoResize);
+
+  const ratingInput = document.createElement('input');
+  ratingInput.type = 'number';
+  ratingInput.min = '1';
+  ratingInput.max = '10';
+  ratingInput.step = '1';
+  ratingInput.className = 'evidence-rating';
+  ratingInput.placeholder = '1-10';
+  ratingInput.oninput = highlightHighestAgainst;
+
+  row.appendChild(textArea);
+  row.appendChild(ratingInput);
+  container.appendChild(row);
+
+  autoResize({ target: textArea });
+}
   
   function highlightHighestAgainst() {
     const rows = document.querySelectorAll('#evidenceAgainstContainer .evidence-row');

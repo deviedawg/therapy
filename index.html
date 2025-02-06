@@ -894,7 +894,8 @@ h2 {
     <label for="userEmail">Your Email Address: </label>
     <input type="text" id="userEmail" placeholder="you@example.com" value="devoncbt@gmail.com" />
 
-    <button class="send-email" onclick="sendEmail()">Send Email with Your Results</button>
+    <button class="send-email" id="sendEmailBtn" onclick="sendEmail()">Send Email with Your Results</button>
+
     <p>(This will open your mail client so you can review and send.)</p>
   </div>
 
@@ -1480,29 +1481,27 @@ h2 {
   }
   
   function sendEmail() {
-    const summary = buildSummary();
-    const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
-  
-    // Get the user's email
-    const userEmail = document.getElementById("userEmail").value.trim();
-    if (!userEmail) {
-      alert("Please enter your email address first.");
-      return;
-    }
-  
-    // Subject line
-    const customTitle = document.getElementById("emailTitle").value.trim();
-    let finalSubject = "Your CBT Questionnaire Results";
-    if (customTitle) {
-      finalSubject += ` - ${customTitle}`;
-    }
-  
-    // mailto link
-    const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${safeBody}`;
-  
-    // Open mail client
-    window.location.href = mailtoLink;
+  const summary = buildSummary();
+  const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
+
+  const userEmail = document.getElementById("userEmail").value.trim();
+  if (!userEmail) {
+    alert("Please enter your email address first.");
+    return;
   }
+
+  const customTitle = document.getElementById("emailTitle").value.trim();
+  let finalSubject = "CBT";
+  if (customTitle) {
+    finalSubject += ` - ${customTitle}`;
+  }
+
+  const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${safeBody}`;
+
+  // Open the mailto link in a new tab
+  window.open(mailtoLink, '_blank');
+}
+
   </script>
   
 </body>

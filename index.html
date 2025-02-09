@@ -367,7 +367,6 @@ h2 {
   }
 </style>
 
-  </style>
 </head>
 <body>
 <div class="container">
@@ -1018,7 +1017,9 @@ h2 {
   -------------------------- */
   function showFeelingBlock(num) {
     const block = document.getElementById(`feelingBlock${num}`);
-    block.classList.remove("hidden");
+    if (block) {
+      block.classList.remove("hidden");
+    }
   
     // Hide the "Add Another Feeling" button once a block is revealed
     if (num === 2) {
@@ -1382,8 +1383,8 @@ h2 {
   -------------------------- */
   function buildSummary() {
     // STEP 1
-    const situation = document.getElementById("situationInput").value.trim();
-  
+    const situation = document.getElementById("situationInput")?.value.trim() || "(No situation provided)";
+
     // STEP 2
     const feelingData = [];
     // Feeling #1
@@ -1482,7 +1483,7 @@ h2 {
   
   function sendEmail() {
   const summary = buildSummary();
-  const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A');
+  const safeBody = encodeURIComponent(summary).replace(/%0A/g, '%0D%0A').replace(/%20/g, '+');
 
   const userEmail = document.getElementById("userEmail").value.trim();
   if (!userEmail) {

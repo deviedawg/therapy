@@ -1499,9 +1499,18 @@ h2 {
 
   const mailtoLink = `mailto:${encodeURIComponent(userEmail)}?subject=${encodeURIComponent(finalSubject)}&body=${safeBody}`;
 
-  // Open the mailto link in a new tab
-  window.open(mailtoLink, '_blank');
+  // Create a hidden anchor element
+  const tempLink = document.createElement('a');
+  tempLink.href = mailtoLink;
+  tempLink.style.display = 'none';
+  tempLink.target = '_blank';  // Open in a new tab
+
+  // Append to body, trigger click, then remove
+  document.body.appendChild(tempLink);
+  tempLink.click();
+  document.body.removeChild(tempLink);
 }
+
 
   </script>
   

@@ -197,7 +197,130 @@ async function fetchPreviousResults() {
   }
   
   
+  function formatSummary(summary) {
+    // Mapping for distortions emojis (keys in uppercase)
+    const distortionEmojis = {
+      "MAGNIFICATION/MINIMIZATION": "🔍",
+      "CATASTROPHIZING": "💥",
+      "OVERGENERALIZATION": "🌐",
+      "MAGICAL THINKING": "🔮",
+      "PERSONALIZATION": "🤔",
+      "JUMPING TO CONCLUSIONS": "🤸",
+      "MIND READING": "🧠",
+      "FORTUNE TELLING": "🔭",
+      "EMOTIONAL REASONING": "❤️",
+      "DISQUALIFYING THE POSITIVE": "🙅",
+      "SHOULD STATEMENTS": "⚖️",
+      "ALL-OR-NOTHING THINKING": "♾️"
+    };
   
+    // Split the summary text into lines and group them into sections.
+    const lines = summary.split('\n');
+    let sections = [];
+    let currentSection = null;
+    
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed) return; // Skip empty lines
+  
+      if (trimmed.indexOf(":") !== -1) {
+        if (currentSection) {
+          sections.push(currentSection);
+        }
+        let [header, ...rest] = trimmed.split(":");
+        let value = rest.join(":").trim();
+        currentSection = { header: header.trim().toUpperCase(), value: value };
+      } else {
+        if (currentSection) {
+          currentSection.value += "\n" + trimmed;
+        } else {
+          currentSection = { header: "", value: trimmed };
+        }
+      }
+    });
+    if (currentSection) sections.push(currentSection);
+  
+    // Define which headers should be rendered as a list.
+    const listHeaders = ["THOUGHTS", "EVIDENCE FOR", "EVIDENCE AGAINST"];
+    let html = "";
+  
+    sections.forEach(section => {
+      if (!section.header) {
+        // No header: merge lines into paragraphs.
+        const paragraphs = section.value
+          .split("\n")
+          .filter(l => l.trim() !== "")
+          .map(l => `<p class="normal-line">${l.trim()}</p>`)
+          .join("");
+        html += `<div class="summary-section">
+                   <div class="summary-value">${paragraphs}</div>
+                 </div>`;
+      } else if (section.header === "DISTORTIONS") {
+        // For DISTORTIONS, output as a grid layout.
+        if (section.value.toUpperCase() === "(NONE)") {
+          html += `<div class="summary-section">
+                     <span class="summary-header">${section.header}:</span>
+                     <div class="summary-value"><p>(None)</p></div>
+                   </div>`;
+        } else {
+          const entries = section.value.split(",").filter(e => e.trim() !== "");
+          html += `<div class="summary-section">
+                     <span class="summary-header">${section.header}:</span>
+                     <div class="distortion-grid-review">`;
+          entries.forEach(entry => {
+            const dist = entry.trim();
+            const key = dist.toUpperCase();
+            const emoji = distortionEmojis[key] || "";
+            html += `<div class="distortion-item">
+                       <span class="distortion-icon">${emoji}</span>
+                       <span class="distortion-text">${dist}</span>
+                     </div>`;
+          });
+          html += `</div></div>`;
+        }
+      } else if (listHeaders.includes(section.header)) {
+        // For THOUGHTS, EVIDENCE FOR, and EVIDENCE AGAINST, use an ordered list.
+        const entries = section.value.split(";").filter(e => e.trim() !== "");
+        let maxDistress = 0;
+        if (section.header === "THOUGHTS") {
+          entries.forEach(entry => {
+            const match = entry.match(/\(Distress:\s*(\d+)\)/i);
+            if (match) {
+              const val = parseInt(match[1], 10);
+              if (val > maxDistress) maxDistress = val;
+            }
+          });
+        }
+        html += `<div class="summary-section">
+                   <span class="summary-header">${section.header}:</span>
+                   <ol class="summary-list">`;
+        entries.forEach(entry => {
+          let extraClass = "";
+          if (section.header === "THOUGHTS") {
+            const match = entry.match(/\(Distress:\s*(\d+)\)/i);
+            if (match && parseInt(match[1], 10) === maxDistress && maxDistress > 0) {
+              extraClass = " highest-distress";
+            }
+          }
+          html += `<li class="entry-line${extraClass}">${entry.trim()}</li>`;
+        });
+        html += `</ol></div>`;
+      } else {
+        // For other sections, split by newline and wrap each in a paragraph.
+        const paragraphs = section.value
+          .split("\n")
+          .filter(l => l.trim() !== "")
+          .map(l => `<p class="normal-line">${l.trim()}</p>`)
+          .join("");
+        html += `<div class="summary-section">
+                   <span class="summary-header">${section.header}:</span>
+                   <div class="summary-value">${paragraphs}</div>
+                 </div>`;
+      }
+    });
+  
+    return html;
+  }
   
 
 /**
@@ -206,13 +329,14 @@ async function fetchPreviousResults() {
 function showResultDetails(record) {
     const modal = document.getElementById("resultModal");
     const modalContent = document.getElementById("resultModalContent");
-  
-    // Populate modal content – you might want to format the details nicely
-    modalContent.textContent = record.content;  // You can use innerHTML if your content contains HTML
-  
+    
+    // Format the record content (assumed to be the summary text)
+    modalContent.innerHTML = formatSummary(record.content);
+    
     // Display the modal
     modal.style.display = "block";
   }
+  
 
 /********************************************
  *  3) ALL YOUR ORIGINAL CBT LOGIC
@@ -560,52 +684,53 @@ function autoResize(e) {
    Build final summary
 -------------------------- */
 function buildSummary() {
-  // Step 1: The Situation
-  const situation = document.getElementById("situationInput")?.value.trim() || "(No situation provided)";
-
-  // Step 2: The Feelings
-  const feelings = [];
-  for (let i = 1; i <= 3; i++) {
-    const feeling = document.getElementById(`feelingSelect${i}`);
-    const subFeeling = document.getElementById(`subFeelingSelect${i}`);
-    if (feeling && !feeling.parentElement.classList.contains("hidden")) {
-      const broad = feeling.value || "(None)";
-      const sub = subFeeling.value || "(None)";
-      feelings.push(`${broad}${sub !== "(None)" ? ` (${sub})` : ""}`);
+    // Step 1: The Situation
+    const situation = document.getElementById("situationInput")?.value.trim() || "(No situation provided)";
+  
+    // Step 2: The Feelings
+    const feelings = [];
+    for (let i = 1; i <= 3; i++) {
+      const feeling = document.getElementById(`feelingSelect${i}`);
+      const subFeeling = document.getElementById(`subFeelingSelect${i}`);
+      if (feeling && !feeling.parentElement.classList.contains("hidden")) {
+        const broad = feeling.value || "(None)";
+        const sub = subFeeling.value || "(None)";
+        feelings.push(`${broad}${sub !== "(None)" ? ` (${sub})` : ""}`);
+      }
     }
+  
+    // Step 3: The Thoughts
+    const thoughtsData = getAllThoughts();
+    const thoughts = thoughtsData.length
+      ? thoughtsData.map(t => `${t.thought} (Distress: ${t.distress})`).join("; ")
+      : "(No thoughts provided)";
+  
+    // Step 4: Evaluate the Thought
+    const distortions = getSelectedDistortions().join(", ") || "(None)";
+    const evFor = getAllEvidenceFor()
+      .map(e => `${e.text} (${e.rating || "-"})`)
+      .join("; ") || "(None)";
+    const evAgainst = getAllEvidenceAgainst()
+      .map(e => `${e.text} (${e.rating || "-"})`)
+      .join("; ") || "(None)";
+  
+    // Step 5: Make a Decision
+    const accuracy = document.querySelector('input[name="accuracy"]:checked')?.value || "(Undecided)";
+    const actionPlan = document.getElementById("newThought").value.trim() || "(No action plan provided)";
+  
+    // Final Summary
+    return `
+  SITUATION: ${situation}
+  FEELINGS: ${feelings.join(", ") || "(None)"}
+  THOUGHTS: ${thoughts}
+  DISTORTIONS: ${distortions}
+  EVIDENCE FOR: ${evFor}
+  EVIDENCE AGAINST: ${evAgainst}
+  DECISION: ${accuracy}
+  ACTION PLAN: ${actionPlan}
+    `.trim();
   }
-
-  // Step 3: The Thoughts
-  const thoughtsData = getAllThoughts();
-  const thoughts = thoughtsData.length
-    ? thoughtsData.map((t, i) => `#${i + 1}: ${t.thought} (Distress: ${t.distress})`).join("; ")
-    : "(No thoughts provided)";
-
-  // Step 4: Evaluate the Thought
-  const distortions = getSelectedDistortions().join(", ") || "(None)";
-  const evFor = getAllEvidenceFor()
-    .map((e, i) => `#${i + 1}: ${e.text} (${e.rating || "-"})`)
-    .join("; ") || "(None)";
-  const evAgainst = getAllEvidenceAgainst()
-    .map((e, i) => `#${i + 1}: ${e.text} (${e.rating || "-"})`)
-    .join("; ") || "(None)";
-
-  // Step 5: Make a Decision
-  const accuracy = document.querySelector('input[name="accuracy"]:checked')?.value || "(Undecided)";
-  const actionPlan = document.getElementById("newThought").value.trim() || "(No action plan provided)";
-
-  // Final Summary
-  return `
-SITUATION: ${situation}
-FEELINGS: ${feelings.join(", ") || "(None)"}
-THOUGHTS: ${thoughts}
-DISTORTIONS: ${distortions}
-EVIDENCE FOR: ${evFor}
-EVIDENCE AGAINST: ${evAgainst}
-DECISION: ${accuracy}
-ACTION PLAN: ${actionPlan}
-  `.trim();
-}
+  
 
 function openTab(evt, tabName) {
     // Declare all variables

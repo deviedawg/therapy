@@ -357,7 +357,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border-bottom: 1px solid var(--primary);;
+      border-bottom: 2px solid var(--primary);;
       margin-bottom: 25px;
     }
 
@@ -418,4 +418,161 @@
     
     .result-card {
       position: relative; /* Ensures that .delete-btn is positioned relative to the card */
+    }
+
+   /* Container for each summary section */
+    .summary-section {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #333;
+    }
+
+    /* Section header styling */
+    .summary-header {
+      display: block;
+      font-weight: bold;
+      color: var(--primary); /* e.g., #5ef939 */
+      margin-bottom: 0.5rem;
+      font-size: 18px;
+    }
+
+    /* Styling for the summary value block */
+    .summary-value {
+      margin-left: 1rem;
+    }
+
+    /* Ordered list for multi-entry sections */
+    .summary-list {
+      margin-left: 1rem;
+      padding-left: 1rem;
+    }
+
+    /* List items styling */
+    .entry-line {
+      margin-bottom: 10px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: #ffffff;
+    }
+
+    /* Normal paragraph lines */
+    .normal-line {
+      margin-bottom: 10px;
+      font-size: 18px;
+      line-height: 1.6;
+      color: #ffffff;
+    }
+
+    /* Highlight for the thought with the highest distress score */
+    .highest-distress {
+      background-color: rgba(255, 68, 68, 0.2); /* light red background */
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    /* Responsive adjustments for mobile */
+    @media (max-width: 600px) {
+      .summary-header,
+      .normal-line,
+      .entry-line {
+        font-size: 15px;
+      }
+    }
+
+    /* Ensure modal content is scrollable if needed */
+    #resultModalContent {
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    /* Distortions Grid Container */
+    .distortion-grid {
+      display: grid;
+      /* auto-fit will fill available space, with each item at least 200px wide */
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-gap: 1rem;
+      /* Constrain overall grid width to force at most four columns on larger screens */
+      max-width: 850px;
+      margin: 0 auto;  /* center the grid in its container */
+      justify-items: center;
+    }
+
+    /* Each Distortion Item (label) */
+    .distortion-grid label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #2a2a2a;
+      border-radius: 4px;
+      padding: 1rem;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* Emoji styling (bigger size) */
+    .distortion-icon {
+      font-size: 2.5rem;  /* Increase as desired */
+      margin-bottom: 0.5rem;
+      color: var(--primary);  /* e.g. #5ef939 */
+    }
+
+    /* Description styling (bigger text) */
+    .distortion-desc {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    /* Optional: on very small screens, adjust font sizes further */
+    @media (max-width: 600px) {
+      .distortion-icon {
+        font-size: 2rem;
+      }
+      .distortion-desc {
+        font-size: 1rem;
+      }
+    }
+
+
+    /* Distortions grid for review page */
+    .distortion-grid-review {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    /* Each distortion item */
+    .distortion-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #2a2a2a;
+      border-radius: 4px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    /* Emoji styling */
+    .distortion-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+
+    /* Distortion text styling */
+    .distortion-text {
+      font-size: 1.2rem;
+      color: #ffffff;
+    }
+
+    /* Responsive adjustments for mobile */
+    @media (max-width: 600px) {
+      .distortion-icon {
+        font-size: 2rem;
+      }
+      .distortion-text {
+        font-size: 1rem;
+      }
     }

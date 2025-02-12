@@ -562,7 +562,7 @@
 <div id="Tab2" class="tabcontent">
 
   <div class="card">
-    <h2>My Previous Results</h2>
+    <h2>My CBT Results</h2>
     <div id="resultsList" style="
       max-height:300px; 
       overflow-y:auto; 
@@ -683,6 +683,15 @@
   </div>
 
 </div>
+
+<!-- Result Modal -->
+<div id="resultModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeResultModal()">&times;</span>
+    <div id="resultModalContent"></div>
+  </div>
+</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pocketbase/0.8.0-rc1/pocketbase.umd.js"></script>
 <script src="script.js"></script>

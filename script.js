@@ -5,7 +5,7 @@
 //  <script src="https://cdn.jsdelivr.net/npm/pocketbase@0.13.3/dist/pocketbase.umd.js"></script>
 //  Then include *this* script AFTER that, e.g. <script src="script.js"></script>
 
-const pb = new PocketBase("http://127.0.0.1:8090");
+const pb = new PocketBase("https://pocketbase-production-533b.up.railway.app/");
 // e.g. "http://127.0.0.1:8090" or your deployed PB server
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", async () => {
  * On success, hides the login form and shows the main app.
  */
 async function login() {
-  alert('ji');
   const email = document.getElementById("loginEmail").value.trim();
   const password = document.getElementById("loginPassword").value.trim();
   const msgEl = document.getElementById("loginMessage");
@@ -85,27 +84,52 @@ function showLoginSection() {
  * Builds a summary of all the CBT fields, then saves to PocketBase
  */
 async function saveToDB() {
-  const saveMsg = document.getElementById("saveMessage");
-  saveMsg.textContent = "...saving...";
+    const saveMsg = document.getElementById("saveMessage");
 
-  try {
-    const title = document.getElementById("entryTitle").value.trim() || "Untitled Entry";
-    const content = buildSummary(); // uses the existing function from below
+    if (isFormEmpty()) {
+        saveMsg.textContent = "Please fill in at least one field before saving.";
+        return; // abort saving if nothing is entered
+    }
 
-    // Create a record in your custom collection, e.g. "cognitive_restructures"
-    // Make sure that collection has a "title" field, a "content" field, and a "userId" field.
-    // Also ensure your PocketBase security rules let the user create & read their own data.
-    await pb.collection("cognitive_restructures").create({
+    saveMsg.textContent = "...saving...";
+    
+    try {
+      const title = document.getElementById("entryTitle").value.trim() || "Untitled Entry";
+      const content = buildSummary(); // builds the summary of CBT inputs
+  
+      // Create a record in your "cognitive_restructures" collection.
+      await pb.collection("cognitive_restructures").create({
         title: title,
         content: content,
         userId: pb.authStore.model.id
-    });
-
-    saveMsg.textContent = "Saved!";
-  } catch (err) {
-    saveMsg.textContent = "Error saving: " + err.message;
+      });
+  
+      // Immediately refresh the results list so the new entry appears
+      fetchPreviousResults();
+  
+      // Change the message to include a link to the CBT results tab
+      saveMsg.innerHTML = "Saved! <a href='#' id='seeResultsLink'>See results page</a>";
+      document.getElementById("seeResultsLink").addEventListener("click", (e) => {
+        e.preventDefault();
+        // Call the openTab function with a dummy event and Tab2 as the target tab
+        openTab(new Event("click"), "Tab2");
+      });
+    } catch (err) {
+      saveMsg.textContent = "Error saving: " + err.message;
+    }
   }
-}
+
+function isFormEmpty() {
+    // Select all text inputs and textareas in the container (adjust the selector if needed)
+    const fields = document.querySelectorAll(".container input[type='text'], .container textarea");
+    for (let field of fields) {
+      if (field.value.trim() !== "") {
+        return false; // found at least one field with content
+      }
+    }
+    return true; // all fields are empty
+  }
+  
 
 /**
  * Fetches all CBT entries for the current user and displays them in a list.
@@ -144,13 +168,27 @@ async function fetchPreviousResults() {
         card.style.cursor = "pointer";
         card.style.transition = "transform 0.2s";
         card.textContent = `${rec.title} — ${new Date(rec.created).toLocaleString()}`;
-  
-        // Add hover effect
-        card.addEventListener("mouseover", () => (card.style.transform = "scale(1.05)"));
-        card.addEventListener("mouseout", () => (card.style.transform = "scale(1)"));
-  
-        // Add click event to show detailed view
+        
+        // Position card relatively so we can absolutely position the delete button
+        card.style.position = "relative";
+        
+        // Create the delete button element
+        const deleteBtn = document.createElement("span");
+        deleteBtn.textContent = "×"; // Unicode multiplication sign
+        deleteBtn.className = "delete-btn";
+        
+        // When clicking the delete button, prevent the card’s click event from firing
+        deleteBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          deleteEntry(rec.id);
+        });
+        
+        // Append the delete button to the card
+        card.appendChild(deleteBtn);
+        
+        // When the card is clicked, show details (as before)
         card.addEventListener("click", () => showResultDetails(rec));
+        
         resultsList.appendChild(card);
       });
     } catch (err) {
@@ -166,19 +204,15 @@ async function fetchPreviousResults() {
  * Toggles showing the full details of a single result record.
  */
 function showResultDetails(record) {
-  const detailEl = document.getElementById("selectedResultDetails");
-
-  // If we click the same item that is already open, hide it
-  if (detailEl.dataset.id === record.id && detailEl.style.display !== "none") {
-    detailEl.style.display = "none";
-    return;
+    const modal = document.getElementById("resultModal");
+    const modalContent = document.getElementById("resultModalContent");
+  
+    // Populate modal content – you might want to format the details nicely
+    modalContent.textContent = record.content;  // You can use innerHTML if your content contains HTML
+  
+    // Display the modal
+    modal.style.display = "block";
   }
-
-  // Otherwise, fill in the content and show
-  detailEl.dataset.id = record.id;
-  detailEl.textContent = record.content; 
-  detailEl.style.display = "block";
-}
 
 /********************************************
  *  3) ALL YOUR ORIGINAL CBT LOGIC
@@ -595,3 +629,31 @@ function openTab(evt, tabName) {
   }
   
   document.getElementById("defaultOpen").click();
+
+  async function deleteEntry(recordId) {
+    // Use the browser's confirm dialog (you could also create a custom modal)
+    if (!confirm("Are you sure you want to delete this entry? This action cannot be undone.")) {
+      return;
+    }
+    
+    try {
+      await pb.collection("cognitive_restructures").delete(recordId);
+      alert("Entry deleted successfully.");
+      fetchPreviousResults(); // Refresh the list after deletion
+    } catch (err) {
+      alert("Error deleting entry: " + err.message);
+    }
+  }
+
+  function closeResultModal() {
+    document.getElementById("resultModal").style.display = "none";
+  }
+  
+
+  window.onclick = function(event) {
+    const modal = document.getElementById("resultModal");
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+  

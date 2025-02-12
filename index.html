@@ -1382,104 +1382,53 @@ h2 {
      Build final summary + send email
   -------------------------- */
   function buildSummary() {
-    // STEP 1
-    const situation = document.getElementById("situationInput")?.value.trim() || "(No situation provided)";
+  // Step 1: The Situation
+  const situation = document.getElementById("situationInput")?.value.trim() || "(No situation provided)";
 
-    // STEP 2
-    const feelingData = [];
-    // Feeling #1
-    const broad1 = feelingSelect1.value || "(none)";
-    const sub1 = subFeelingSelect1.value || "(none)";
-    if (broad1 !== "(none)") {
-      feelingData.push(`Feeling #1: ${broad1}, Sub-Feeling: ${sub1}`);
+  // Step 2: The Feelings
+  const feelings = [];
+  for (let i = 1; i <= 3; i++) {
+    const feeling = document.getElementById(`feelingSelect${i}`);
+    const subFeeling = document.getElementById(`subFeelingSelect${i}`);
+    if (feeling && !feeling.parentElement.classList.contains("hidden")) {
+      const broad = feeling.value || "(None)";
+      const sub = subFeeling.value || "(None)";
+      feelings.push(`${broad}${sub !== "(None)" ? ` (${sub})` : ""}`);
     }
-    // Feeling #2
-    if (!document.getElementById("feelingBlock2").classList.contains("hidden")) {
-      const broad2 = feelingSelect2.value || "(none)";
-      const sub2 = subFeelingSelect2.value || "(none)";
-      if (broad2 !== "(none)") {
-        feelingData.push(`Feeling #2: ${broad2}, Sub-Feeling: ${sub2}`);
-      }
-    }
-    // Feeling #3
-    if (!document.getElementById("feelingBlock3").classList.contains("hidden")) {
-      const broad3 = feelingSelect3.value || "(none)";
-      const sub3 = subFeelingSelect3.value || "(none)";
-      if (broad3 !== "(none)") {
-        feelingData.push(`Feeling #3: ${broad3}, Sub-Feeling: ${sub3}`);
-      }
-    }
-  
-    // STEP 3 (multiple thoughts)
-    const thoughtsData = getAllThoughts();
-    let step3Text = "(No thoughts entered)";
-    if (thoughtsData.length > 0) {
-      step3Text = thoughtsData
-        .map((obj, idx) => `Thought #${idx+1}: ${obj.thought} (Distress: ${obj.distress})`)
-        .join("\n");
-    }
-  
-    // STEP 4
-    // Distortions chosen
-    const distortionsSelected = getSelectedDistortions();
-    const distortionsString = distortionsSelected.length 
-      ? "Problematic Styles Chosen:\n" + distortionsSelected.join(", ")
-      : "(No problematic thinking styles selected)";
-  
-    // Gather Evidence FOR
-    const forData = getAllEvidenceFor();
-    let evidenceForText = "(No Evidence FOR added)";
-    if (forData.length > 0) {
-      evidenceForText = forData
-        .map((obj, idx) => `FOR #${idx+1}: ${obj.text} (Severity: ${obj.rating})`)
-        .join("\n");
-    }
-  
-    // Gather Evidence AGAINST
-    const againstData = getAllEvidenceAgainst();
-    let evidenceAgainstText = "(No Evidence AGAINST added)";
-    if (againstData.length > 0) {
-      evidenceAgainstText = againstData
-        .map((obj, idx) => `AGAINST #${idx+1}: ${obj.text} (Severity: ${obj.rating})`)
-        .join("\n");
-    }
-  
-    // STEP 5
-    const accuracyRadio = document.querySelector('input[name="accuracy"]:checked');
-    const accuracy = accuracyRadio ? accuracyRadio.value : "(none)";
-    const newThought = document.getElementById("newThought").value.trim();
-  
-    // Build final text
-    return `
-  **STEP 1: THE SITUATION**
-  =====================
-  ${situation}
-  
-  **STEP 2: THE FEELING(S)**
-  =====================
-  ${feelingData.length > 0 ? feelingData.join("\n") : "(No feelings selected)"}
-  
-  **STEP 3: THE THOUGHT(S)**
-  =====================
-  ${step3Text}
-  
-  **STEP 4: EVALUATE THE THOUGHT**
-  =====================
-  ${distortionsString}
-  
-  EVIDENCE FOR:
-  ${evidenceForText}
-  
-  EVIDENCE AGAINST:
-  ${evidenceAgainstText}
-  
-  **STEP 5: MAKE A DECISION**
-  =====================
-  Thought is: ${accuracy}
-  New Thought / Action Plan:
-  ${newThought}
-    `.trim();
   }
+
+  // Step 3: The Thoughts
+  const thoughtsData = getAllThoughts();
+  const thoughts = thoughtsData.length
+    ? thoughtsData.map((t, i) => `#${i + 1}: ${t.thought} (Distress: ${t.distress})`).join("; ")
+    : "(No thoughts provided)";
+
+  // Step 4: Evaluate the Thought
+  const distortions = getSelectedDistortions().join(", ") || "(None)";
+  const evidenceFor = getAllEvidenceFor()
+    .map((e, i) => `#${i + 1}: ${e.text} (${e.rating || "-"})`)
+    .join("; ") || "(None)";
+  const evidenceAgainst = getAllEvidenceAgainst()
+    .map((e, i) => `#${i + 1}: ${e.text} (${e.rating || "-"})`)
+    .join("; ") || "(None)";
+
+  // Step 5: Make a Decision
+  const accuracy = document.querySelector('input[name="accuracy"]:checked')?.value || "(Undecided)";
+  const actionPlan = document.getElementById("newThought").value.trim() || "(No action plan provided)";
+
+  // Final Summary
+  return `
+SITUATION: ${situation}
+FEELINGS: ${feelings.join(", ") || "(None)"}
+THOUGHTS: ${thoughts}
+DISTORTIONS: ${distortions}
+EVIDENCE FOR: ${evidenceFor}
+EVIDENCE AGAINST: ${evidenceAgainst}
+DECISION: ${accuracy}
+ACTION PLAN: ${actionPlan}
+  `.trim();
+}
+
   
   function sendEmail() {
   const summary = buildSummary();

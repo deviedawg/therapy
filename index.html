@@ -1418,16 +1418,16 @@ h2 {
 
   // Final Summary
   return `
-SITUATION: ${situation}
-FEELINGS: ${feelings.join(", ") || "(None)"}
-THOUGHTS: ${thoughts}
-DISTORTIONS: ${distortions}
-EVIDENCE FOR: ${evidenceFor}
-EVIDENCE AGAINST: ${evidenceAgainst}
-DECISION: ${accuracy}
-ACTION PLAN: ${actionPlan}
-  `.trim();
-}
+  SITUATION: ${situation}
+  FEELINGS: ${feelings.join(", ") || "(None)"}
+  THOUGHTS: ${thoughts}
+  DISTORTIONS: ${distortions}
+  EVIDENCE FOR: ${evidenceFor}
+  EVIDENCE AGAINST: ${evidenceAgainst}
+  DECISION: ${accuracy}
+  ACTION PLAN: ${actionPlan}
+    `.trim();
+  }
 
   
   function sendEmail() {

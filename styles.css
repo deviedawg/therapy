@@ -1,0 +1,399 @@
+/* ----------------------------------
+       Basic DARK THEME styling
+    -------------------------------------*/
+    html, body {
+        margin: 0; 
+        padding: 0;
+        background: #121212;
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+        scroll-behavior: smooth;
+      }
+      a, button { cursor: pointer; }
+      h1, h2, h3, h4 { margin: 0; }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      .card {
+        background: #1f1f1f;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      .brief {
+        min-height: 50px;
+      }
+      .card h2 {
+        margin-bottom: 0.5rem;
+      }
+      .offset-margin {
+          margin-bottom: -15px;
+      }
+      label {
+        display: block;
+        margin: 0.5rem 0 0.2rem;
+        padding-bottom: 5px;
+        color: #bdbdbd;
+      }
+  
+      #chosenDistortions {
+        margin-bottom: 15px;
+      }
+  
+      h3 {
+        margin-bottom: 5px !important;
+      }
+  
+      .distortion-desc {
+        margin-top: 0;
+      }
+  
+      input[type="text"], select, textarea {
+        width: 100%;
+        padding: 0.5rem;
+        margin-bottom: 0.8rem;
+        border: 1px solid #333;
+        border-radius: 4px;
+        background: #2a2a2a;
+        color: #ffffff;
+      }
+      textarea {
+          resize: vertical;
+          min-height: 250px;
+      }
+   
+      button {
+        background: #4CAF50;
+        color: #ffffff;
+        border: none;
+        padding: 0.7rem 1rem;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+        margin-top: 0.5rem;
+        font-size: 1rem;
+      }
+      button:hover {
+        background: white;
+      }
+      hr { margin: 2rem 0; border-color: #333; }
+  
+      /* Big instructions toggle */
+      .instructions-toggle, .send-email {
+        background: #5ef939;
+        margin-bottom: 1rem;
+        color: black;
+        font-weight: bold;
+      }
+      .instructions-toggle {
+          margin: 0 auto;
+          width: 100%;
+      }
+      h1 {
+          text-align: center;
+      }
+      .instructions-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-out;
+        border-left: 4px solid #5ef939;
+        margin-bottom: 1rem;
+        padding-left: 1rem;
+      }
+      .instructions-content.open {
+        max-height: 5000px; /* big enough to show all text */
+        transition: max-height 1s ease-in;
+      }
+  
+      .thought-textarea, .evidence-textarea {
+        display: block;
+        width: 100%;
+        /* Start small, will auto-grow as user types */
+        min-height: 40px;
+  
+        background: #2a2a2a;
+        color: #ffffff;
+        border: 1px solid #333;
+        border-radius: 4px;
+        margin-bottom: 0.8rem;
+        padding: 0.5rem;
+  
+        /* Turn off manual drag‐resizing and scrollbars,
+          because we’re auto‐resizing in JS */
+        resize: none;
+        overflow: hidden;
+      }
+  
+      *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+  
+      /* 1) In your HTML <head>:
+  -----------------------------------------------
+  <link rel="stylesheet" 
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
+  -----------------------------------------------
+  
+  2) Then, in your CSS file or <style> block:
+  -----------------------------------------------
+  */
+  
+  /* Apply Nunito across the entire site */
+  
+  /* Ensure form elements inherit the same font */
+  input, textarea, select, button {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: #fff;
+    background: #2a2a2a; /* or your chosen color */
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-bottom: 0.8rem;
+  }
+  
+  /* Example heading style */
+  h1, h2, h3, h4 {
+    margin: 0;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700; /* or 400, 600, etc. */
+  }
+  
+  h2 {
+    color: #5ef939;
+  
+  }
+  
+  
+      /* Modal for Problematic Styles */
+      .modal {
+        display: none; 
+        position: fixed; 
+        z-index: 9999; 
+        left: 0; 
+        top: 0;
+        width: 100%; 
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.8);
+      }
+      .modal-content {
+        background-color: #1f1f1f;
+        margin: 5% auto;
+        padding: 1rem;
+        border-radius: 8px;
+        width: 90%;
+        max-width: 700px;
+        position: relative;
+      }
+      .close {
+        position: absolute;
+        top: 15px; 
+        right: 15px;
+        color: #aaa; 
+        font-size: 28px; 
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .close:hover {
+        color: #fff;
+      }
+      .modal-content h2 {
+        margin-top: 0;
+        margin-bottom: 0.5rem;
+      }
+      .distortion-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 1rem;
+      }
+      .distortion-grid label {
+        background: #2a2a2a;
+        border-radius: 4px;
+        padding: 0.5rem;
+        display: block;
+        cursor: pointer;
+      }
+      .distortion-grid input[type="checkbox"] {
+        margin-right: 0.5rem;
+      }
+      /* On mobile, 1 column layout */
+      @media(max-width: 600px) {
+        .distortion-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+  
+  
+      /* Accordion toggles for step guidance/examples */
+      .accordion-toggle {
+        background: #333;
+        margin-bottom: 0.5rem;
+        border: none;
+        border-radius: 4px;
+        padding: 0.4rem 1rem;
+        font-size: 0.9rem;
+        display: inline-block;
+      }
+      .accordion-toggle:hover { background: #444; }
+      .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.5s ease-out;
+        border-left: 4px solid #444;
+        margin-bottom: 1rem;
+        padding-left: 1rem;
+      }
+      .accordion-content.open {
+        max-height: 1000px; /* enough to show text */
+        transition: max-height 1s ease-in;
+      }
+  
+      /* Feeling wheel */
+      .wheel-container {
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+      .wheel-container img {
+        max-width: 100%;
+        height: auto;
+        cursor: zoom-in;
+      }
+      .zoomed-in {
+        cursor: zoom-out;
+        max-width: 300%;
+      }
+  
+      .distortion-icon {
+      font-size: 1.5rem;      /* tweak size as needed */
+      color: #5ef939;
+      margin-bottom: 0.3rem; 
+      display: inline-block;  /* ensures the icon sits on its own line if desired */
+    }
+  
+    /* The rest can remain the same as your existing distortion-grid styling */
+    .distortion-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-gap: 1rem;
+    }
+    
+    .distortion-grid label {
+      background: #2a2a2a;
+      border-radius: 4px;
+      padding: 0.5rem;
+      display: block;
+      cursor: pointer;
+    }
+    .distortion-grid input[type="checkbox"] {
+      margin-right: 0.5rem;
+    }
+    @media(max-width: 600px) {
+      .distortion-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+    .evidence-row {
+      display: flex; 
+      flex-wrap: wrap; 
+      margin-bottom: 1rem;
+    }
+    .evidence-text {
+      flex: 1;
+      margin-right: 0.5rem;
+    }
+    .evidence-rating {
+      width: 70px;
+    }
+    /* On smaller screens, stack them */
+    @media (max-width: 600px) {
+      .evidence-row {
+        flex-direction: column;
+      }
+      .evidence-text {
+        margin-right: 0; 
+        margin-bottom: 0.5rem;
+      }
+    }
+  
+    /* Optionally tweak the paragraph style under each title: */
+    .distortion-desc {
+      margin: 0.25rem 0 0;
+    }
+  
+      /* Hiding optional feelings initially */
+      .hidden { display: none; }
+  
+  
+    /* Each "thought row" with text & rating side by side */
+    .thought-row {
+      display: flex; 
+      flex-wrap: wrap; 
+      margin-bottom: 1rem;
+    }
+  
+    /* Let the text field take the remaining space */
+    .thought-text {
+      flex: 1;
+      margin-right: 0.5rem;
+    }
+  
+    /* The rating field can be narrower */
+    .thought-rating {
+      width: 70px;
+    }
+
+    /* Style the tab */
+    .tab {
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Style the buttons inside the tab */
+    .tab button {
+      background-color: inherit;
+      float: left;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      transition: 0.3s;
+      color: white;
+    }
+
+    /* Change background color of buttons on hover */
+    .tab button:hover {
+      background-color: white;
+      color: black;
+    }
+
+    /* Create an active/current tablink class */
+    .tab button.active {
+      background-color: #5ef939;
+      color: black;
+    }
+
+    /* Style the tab content */
+    .tabcontent {
+      display: none;
+      padding: 6px 12px;
+      border-top: none;
+    }
+  
+    /* On smaller screens, stack them */
+    @media (max-width: 600px) {
+      .thought-row {
+        flex-direction: column;
+      }
+      .thought-text {
+        margin-right: 0; 
+        margin-bottom: 0.5rem;
+      }
+    }
+

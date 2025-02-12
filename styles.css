@@ -471,13 +471,13 @@
     }
 
     /* Responsive adjustments for mobile */
-    @media (max-width: 600px) {
+    /* @media (max-width: 600px) {
       .summary-header,
       .normal-line,
       .entry-line {
         font-size: 15px;
       }
-    }
+    } */
 
     /* Ensure modal content is scrollable if needed */
     #resultModalContent {
@@ -576,3 +576,107 @@
         font-size: 1rem;
       }
     }
+
+
+ /* General summary section styling */
+.summary-section {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #333;
+}
+
+.summary-header {
+  display: block;
+  font-weight: bold;
+  color: var(--primary); /* e.g., #5ef939 */
+  margin-bottom: 0.5rem;
+  font-size: 18px;
+}
+
+.summary-value {
+  margin-left: 1rem;
+}
+
+/* Ordered list styling for list sections */
+.summary-list {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.entry-line {
+  margin-bottom: 10px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+.normal-line {
+  margin-bottom: 10px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #ffffff;
+}
+
+/* Highlight for highest distress entries */
+.highest-distress {
+  background-color: rgba(255, 68, 68, 0.2); /* light red background */
+  padding: 4px;
+  border-radius: 4px;
+}
+
+/* Decision styling: inaccurate gets light green; accurate gets yellow; larger text */
+.decision-inaccurate {
+  background-color: rgba(144,238,144,0.3); /* light green */
+  font-size: 20px;
+  padding: 5px;
+  border-radius: 4px;
+}
+.decision-accurate {
+  background-color: rgba(255,255,0,0.3); /* yellow */
+  font-size: 20px;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+.distortion-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #2a2a2a;
+  border-radius: 4px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.distortion-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.distortion-text {
+  font-size: 1.2rem;
+  color: #ffffff;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 600px) {
+  .summary-header,
+  .normal-line,
+  .entry-line {
+    font-size: 15px;
+  }
+  .distortion-icon {
+    font-size: 2rem;
+  }
+  .distortion-text {
+    font-size: 1rem;
+  }
+}
+
+/* Ensure the modal content is scrollable if needed */
+#resultModalContent {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 1rem;
+}

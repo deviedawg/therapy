@@ -214,15 +214,14 @@ async function fetchPreviousResults() {
       "ALL-OR-NOTHING THINKING": "♾️"
     };
   
-    // Split the summary text into lines and group them into sections.
+    // Split summary into lines and group them into sections.
     const lines = summary.split('\n');
     let sections = [];
     let currentSection = null;
     
     lines.forEach(line => {
       const trimmed = line.trim();
-      if (!trimmed) return; // Skip empty lines
-  
+      if (!trimmed) return;
       if (trimmed.indexOf(":") !== -1) {
         if (currentSection) {
           sections.push(currentSection);
@@ -240,15 +239,14 @@ async function fetchPreviousResults() {
     });
     if (currentSection) sections.push(currentSection);
   
-    // Define which headers should be rendered as a list.
+    // Headers that should be rendered as lists.
     const listHeaders = ["THOUGHTS", "EVIDENCE FOR", "EVIDENCE AGAINST"];
     let html = "";
   
     sections.forEach(section => {
       if (!section.header) {
-        // No header: merge lines into paragraphs.
-        const paragraphs = section.value
-          .split("\n")
+        // No header: wrap extra lines in paragraphs.
+        const paragraphs = section.value.split("\n")
           .filter(l => l.trim() !== "")
           .map(l => `<p class="normal-line">${l.trim()}</p>`)
           .join("");
@@ -256,7 +254,7 @@ async function fetchPreviousResults() {
                    <div class="summary-value">${paragraphs}</div>
                  </div>`;
       } else if (section.header === "DISTORTIONS") {
-        // For DISTORTIONS, output as a grid layout.
+        // For DISTORTIONS, output as a grid.
         if (section.value.toUpperCase() === "(NONE)") {
           html += `<div class="summary-section">
                      <span class="summary-header">${section.header}:</span>
@@ -278,37 +276,50 @@ async function fetchPreviousResults() {
           });
           html += `</div></div>`;
         }
+      } else if (section.header === "DECISION") {
+        // For DECISION, apply special classes based on the value.
+        let decisionText = section.value;
+        let decisionClass = "";
+        if (decisionText.trim().toUpperCase() === "INACCURATE") {
+          decisionClass = " decision-inaccurate";
+        } else if (decisionText.trim().toUpperCase() === "ACCURATE") {
+          decisionClass = " decision-accurate";
+        }
+        const paragraphs = decisionText.split("\n")
+          .filter(l => l.trim() !== "")
+          .map(l => `<p class="normal-line">${l.trim()}</p>`)
+          .join("");
+        html += `<div class="summary-section">
+                   <span class="summary-header">${section.header}:</span>
+                   <div class="summary-value${decisionClass}">${paragraphs}</div>
+                 </div>`;
       } else if (listHeaders.includes(section.header)) {
-        // For THOUGHTS, EVIDENCE FOR, and EVIDENCE AGAINST, use an ordered list.
+        // For THOUGHTS, EVIDENCE FOR, and EVIDENCE AGAINST, render as an ordered list.
         const entries = section.value.split(";").filter(e => e.trim() !== "");
         let maxDistress = 0;
-        if (section.header === "THOUGHTS") {
-          entries.forEach(entry => {
-            const match = entry.match(/\(Distress:\s*(\d+)\)/i);
-            if (match) {
-              const val = parseInt(match[1], 10);
-              if (val > maxDistress) maxDistress = val;
-            }
-          });
-        }
+        // Calculate maximum distress rating for the section.
+        entries.forEach(entry => {
+          let match = entry.match(/\(DISTRESS:\s*(\d+)\)/i) || entry.match(/\((\d+)\)/);
+          if (match) {
+            const val = parseInt(match[1], 10);
+            if (val > maxDistress) maxDistress = val;
+          }
+        });
         html += `<div class="summary-section">
                    <span class="summary-header">${section.header}:</span>
                    <ol class="summary-list">`;
         entries.forEach(entry => {
           let extraClass = "";
-          if (section.header === "THOUGHTS") {
-            const match = entry.match(/\(Distress:\s*(\d+)\)/i);
-            if (match && parseInt(match[1], 10) === maxDistress && maxDistress > 0) {
-              extraClass = " highest-distress";
-            }
+          let match = entry.match(/\(DISTRESS:\s*(\d+)\)/i) || entry.match(/\((\d+)\)/);
+          if (match && parseInt(match[1], 10) === maxDistress && maxDistress > 0) {
+            extraClass = " highest-distress";
           }
           html += `<li class="entry-line${extraClass}">${entry.trim()}</li>`;
         });
         html += `</ol></div>`;
       } else {
-        // For other sections, split by newline and wrap each in a paragraph.
-        const paragraphs = section.value
-          .split("\n")
+        // For other sections, split by newline and wrap each line in a paragraph.
+        const paragraphs = section.value.split("\n")
           .filter(l => l.trim() !== "")
           .map(l => `<p class="normal-line">${l.trim()}</p>`)
           .join("");
@@ -321,6 +332,8 @@ async function fetchPreviousResults() {
   
     return html;
   }
+  
+  
   
 
 /**
@@ -687,19 +700,44 @@ function buildSummary() {
     // Step 1: The Situation
     const situation = document.getElementById("situationInput")?.value.trim() || "(No situation provided)";
   
-    // Step 2: The Feelings
+    // Step 2: The Feelings with formatting
+    const feelingsMap = {
+      "fearanxiety": "Fear & Anxiety",
+      "sadnessdepression": "Sadness & Depression",
+      "guiltshame": "Guilt & Shame",
+      "anger": "Anger"
+    };
+  
+    const feelingsEmojis = {
+      "fear & anxiety": "😨",
+      "sadness & depression": "😢",
+      "guilt & shame": "😔",
+      "anger": "😡"
+    };
+  
     const feelings = [];
     for (let i = 1; i <= 3; i++) {
       const feeling = document.getElementById(`feelingSelect${i}`);
       const subFeeling = document.getElementById(`subFeelingSelect${i}`);
       if (feeling && !feeling.parentElement.classList.contains("hidden")) {
-        const broad = feeling.value || "(None)";
-        const sub = subFeeling.value || "(None)";
-        feelings.push(`${broad}${sub !== "(None)" ? ` (${sub})` : ""}`);
+        const broadRaw = feeling.value || "";
+        const broadFormatted = feelingsMap[broadRaw.toLowerCase()] || feeling.value;
+        // Only add emoji for the first feeling
+        let emoji = "";
+        if (i === 1 && feelingsEmojis[broadFormatted]) {
+          emoji = feelingsEmojis[broadFormatted] + " ";
+        }
+        const sub = subFeeling.value || "";
+        if (sub && sub !== "(None)") {
+           feelings.push(`${emoji}${broadFormatted} (${sub})`);
+        } else {
+           feelings.push(`${emoji}${broadFormatted}`);
+        }
       }
     }
   
-    // Step 3: The Thoughts
+    // Step 3: The Thoughts – these are saved without numbering.
+    // Each thought is expected to include a distress rating in the format "(Distress: X)".
     const thoughtsData = getAllThoughts();
     const thoughts = thoughtsData.length
       ? thoughtsData.map(t => `${t.thought} (Distress: ${t.distress})`).join("; ")
@@ -718,7 +756,7 @@ function buildSummary() {
     const accuracy = document.querySelector('input[name="accuracy"]:checked')?.value || "(Undecided)";
     const actionPlan = document.getElementById("newThought").value.trim() || "(No action plan provided)";
   
-    // Final Summary
+    // Final Summary – note that numbering is removed since the review display uses OL numbering.
     return `
   SITUATION: ${situation}
   FEELINGS: ${feelings.join(", ") || "(None)"}
@@ -730,6 +768,7 @@ function buildSummary() {
   ACTION PLAN: ${actionPlan}
     `.trim();
   }
+  
   
 
 function openTab(evt, tabName) {
